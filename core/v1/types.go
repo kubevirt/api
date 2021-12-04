@@ -1932,6 +1932,8 @@ type KubeVirtConfiguration struct {
 	CPURequest             *resource.Quantity      `json:"cpuRequest,omitempty"`
 	DeveloperConfiguration *DeveloperConfiguration `json:"developerConfiguration,omitempty"`
 	EmulatedMachines       []string                `json:"emulatedMachines,omitempty"`
+	//+kubebuilder:validation:Enum=["Always","Never","IfNotPresent"]
+	//+optional
 	ImagePullPolicy        k8sv1.PullPolicy        `json:"imagePullPolicy,omitempty"`
 	MigrationConfiguration *MigrationConfiguration `json:"migrations,omitempty"`
 	MachineType            string                  `json:"machineType,omitempty"`
