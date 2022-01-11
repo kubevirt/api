@@ -156,26 +156,6 @@ type VirtualMachineInstanceSpec struct {
 	AccessCredentials []AccessCredential `json:"accessCredentials,omitempty"`
 }
 
-func (vmiSpec *VirtualMachineInstanceSpec) UnmarshalJSON(data []byte) error {
-	type VMISpecAlias VirtualMachineInstanceSpec
-	var vmiSpecAlias VMISpecAlias
-
-	if err := json.Unmarshal(data, &vmiSpecAlias); err != nil {
-		return err
-	}
-
-	if vmiSpecAlias.DNSConfig != nil {
-		for i, ns := range vmiSpecAlias.DNSConfig.Nameservers {
-			if sanitizedIP, err := sanitizeIP(ns); err == nil {
-				vmiSpecAlias.DNSConfig.Nameservers[i] = sanitizedIP
-			}
-		}
-	}
-
-	*vmiSpec = VirtualMachineInstanceSpec(vmiSpecAlias)
-	return nil
-}
-
 // VirtualMachineInstancePhaseTransitionTimestamp gives a timestamp in relation to when a phase is set on a vmi
 type VirtualMachineInstancePhaseTransitionTimestamp struct {
 	// Phase is the status of the VirtualMachineInstance in kubernetes world. It is not the VirtualMachineInstance status, but partially correlates to it.
@@ -526,8 +506,6 @@ type VirtualMachineInstanceNetworkInterface struct {
 	IPs []string `json:"ipAddresses,omitempty"`
 	// The interface name inside the Virtual Machine
 	InterfaceName string `json:"interfaceName,omitempty"`
-	// Specifies the origin of the interface data collected. values: domain, guest-agent, or both
-	InfoSource string `json:"infoSource,omitempty"`
 }
 
 type VirtualMachineInstanceGuestOSInfo struct {
@@ -592,13 +570,6 @@ type VirtualMachineInstanceMigrationState struct {
 	MigrationPolicyName *string `json:"migrationPolicyName,omitempty"`
 	// Migration configurations to apply
 	MigrationConfiguration *MigrationConfiguration `json:"migrationConfiguration,omitempty"`
-	// If the VMI requires dedicated CPUs, this field will
-	// hold the dedicated CPU set on the target node
-	// +listType=atomic
-	TargetCPUSet []int `json:"targetCPUSet,omitempty"`
-	// If the VMI requires dedicated CPUs, this field will
-	// hold the numa topology on the target node
-	TargetNodeTopology string `json:"targetNodeTopology,omitempty"`
 }
 
 type MigrationAbortStatus string
@@ -1429,8 +1400,6 @@ const (
 	CacheNone DriverCache = "none"
 	// CacheWriteThrough - I/O from the guest is cached on the host but written through to the physical medium.
 	CacheWriteThrough DriverCache = "writethrough"
-	// CacheWriteBack - I/O from the guest is cached on the host.
-	CacheWriteBack DriverCache = "writeback"
 
 	// IOThreads - User mode based threads with a shared lock that perform I/O tasks. Can impact performance but offers
 	// more predictable behaviour. This method is also takes fewer CPU cycles to submit I/O requests.

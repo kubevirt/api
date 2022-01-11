@@ -4101,11 +4101,6 @@ func (in *VirtualMachineInstanceMigrationState) DeepCopyInto(out *VirtualMachine
 		*out = new(MigrationConfiguration)
 		(*in).DeepCopyInto(*out)
 	}
-	if in.TargetCPUSet != nil {
-		in, out := &in.TargetCPUSet, &out.TargetCPUSet
-		*out = make([]int, len(*in))
-		copy(*out, *in)
-	}
 	return
 }
 
