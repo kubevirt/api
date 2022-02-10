@@ -885,11 +885,6 @@ func (in *Disk) DeepCopyInto(out *Disk) {
 		*out = new(BlockSize)
 		(*in).DeepCopyInto(*out)
 	}
-	if in.Shareable != nil {
-		in, out := &in.Shareable, &out.Shareable
-		*out = new(bool)
-		**out = **in
-	}
 	return
 }
 
