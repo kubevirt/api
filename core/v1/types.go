@@ -249,10 +249,6 @@ type VirtualMachineInstanceStatus struct {
 	// an online vm snapshot
 	// +optional
 	VirtualMachineRevisionName string `json:"virtualMachineRevisionName,omitempty"`
-
-	// RuntimeUser is used to determine what user will be used in launcher
-	// +optional
-	RuntimeUser uint64 `json:"runtimeUser"`
 }
 
 // PersistentVolumeClaimInfo contains the relavant information virt-handler needs cached about a PVC
@@ -797,7 +793,7 @@ const (
 	MigrationSelectorLabel = "kubevirt.io/vmi-name"
 
 	// This annotation represents vmi running nonroot implementation
-	DeprecatedNonRootVMIAnnotation = "kubevirt.io/nonroot"
+	NonRootVMIAnnotation = "kubevirt.io/nonroot"
 
 	// This annotation is to keep virt launcher container alive when an VMI encounters a failure for debugging purpose
 	KeepLauncherAfterFailureAnnotation string = "kubevirt.io/keep-launcher-alive-after-failure"
