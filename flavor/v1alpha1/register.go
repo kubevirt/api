@@ -54,10 +54,6 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&VirtualMachineFlavorList{},
 		&VirtualMachineClusterFlavor{},
 		&VirtualMachineClusterFlavorList{},
-		&VirtualMachinePreference{},
-		&VirtualMachinePreferenceList{},
-		&VirtualMachineClusterPreference{},
-		&VirtualMachineClusterPreferenceList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil

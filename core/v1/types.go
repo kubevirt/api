@@ -303,20 +303,6 @@ type VolumeStatus struct {
 	HotplugVolume *HotplugVolumeStatus `json:"hotplugVolume,omitempty"`
 	// Represents the size of the volume
 	Size int64 `json:"size,omitempty"`
-	// If the volume is memorydump volume, this will contain the memorydump info.
-	MemoryDumpVolume *DomainMemoryDumpInfo `json:"memoryDumpVolume,omitempty"`
-}
-
-// DomainMemoryDumpInfo represents the memory dump information
-type DomainMemoryDumpInfo struct {
-	// StartTimestamp is the time when the memory dump started
-	StartTimestamp *metav1.Time `json:"startTimestamp,omitempty"`
-	// EndTimestamp is the time when the memory dump completed
-	EndTimestamp *metav1.Time `json:"endTimestamp,omitempty"`
-	// ClaimName is the name of the pvc the memory was dumped to
-	ClaimName string `json:"claimName,omitempty"`
-	// TargetFileName is the name of the memory dump output
-	TargetFileName string `json:"targetFileName,omitempty"`
 }
 
 // HotplugVolumeStatus represents the hotplug status of the volume
@@ -345,12 +331,6 @@ const (
 	HotplugVolumeDetaching VolumePhase = "Detaching"
 	// HotplugVolumeUnMounted means the volume has been unmounted from the virt-launcer pod.
 	HotplugVolumeUnMounted VolumePhase = "UnMountedFromPod"
-	// MemoryDumpVolumeCompleted means that the requested memory dump was completed and the dump is ready in the volume
-	MemoryDumpVolumeCompleted VolumePhase = "MemoryDumpCompleted"
-	// MemoryDumpVolumeInProgress means that the volume for the memory dump was attached, and now the command is being triggered
-	MemoryDumpVolumeInProgress VolumePhase = "MemoryDumpInProgress"
-	// MemoryDumpVolumeInProgress means that the volume for the memory dump was attached, and now the command is being triggered
-	MemoryDumpVolumeFailed VolumePhase = "MemoryDumpFailed"
 )
 
 func (v *VirtualMachineInstance) IsScheduling() bool {
@@ -798,9 +778,8 @@ const (
 	// This label represents supported cpu features on the node
 	CPUFeatureLabel = "cpu-feature.node.kubevirt.io/"
 	// This label represents supported cpu models on the node
-	CPUModelLabel                  = "cpu-model.node.kubevirt.io/"
-	SupportedHostModelMigrationCPU = "cpu-model-migration.node.kubevirt.io/"
-	CPUTimerLabel                  = "cpu-timer.node.kubevirt.io/"
+	CPUModelLabel = "cpu-model.node.kubevirt.io/"
+	CPUTimerLabel = "cpu-timer.node.kubevirt.io/"
 	// This label represents supported HyperV features on the node
 	HypervLabel = "hyperv.node.kubevirt.io/"
 	// This label represents vendor of cpu model on the node
@@ -854,12 +833,6 @@ const (
 
 	// ClusterFlavorAnnotation is the name of a VirtualMachineClusterFlavor
 	ClusterFlavorAnnotation string = "kubevirt.io/cluster-flavor-name"
-
-	// FlavorAnnotation is the name of a VirtualMachinePreference
-	PreferenceAnnotation string = "kubevirt.io/preference-name"
-
-	// ClusterFlavorAnnotation is the name of a VirtualMachinePreferenceFlavor
-	ClusterPreferenceAnnotation string = "kubevirt.io/cluster-preference-name"
 
 	// VirtualMachinePoolRevisionName is used to store the vmpool revision's name this object
 	// originated from.
@@ -1285,9 +1258,6 @@ type VirtualMachineSpec struct {
 	// FlavorMatcher references a flavor that is used to fill fields in Template
 	Flavor *FlavorMatcher `json:"flavor,omitempty" optional:"true"`
 
-	// PreferenceMatcher references a set of preference that is used to fill fields in Template
-	Preference *PreferenceMatcher `json:"preference,omitempty" optional:"true"`
-
 	// Template is the direct specification of VirtualMachineInstance
 	Template *VirtualMachineInstanceTemplateSpec `json:"template"`
 
@@ -1395,12 +1365,6 @@ type VirtualMachineStatus struct {
 	// +nullable
 	// +optional
 	StartFailure *VirtualMachineStartFailure `json:"startFailure,omitempty" optional:"true"`
-
-	// MemoryDumpRequest tracks memory dump request phase and info of getting a memory
-	// dump to the given pvc
-	// +nullable
-	// +optional
-	MemoryDumpRequest *VirtualMachineMemoryDumpRequest `json:"memoryDumpRequest,omitempty" optional:"true"`
 }
 
 type VolumeSnapshotStatus struct {
@@ -2026,39 +1990,6 @@ type FreezeUnfreezeTimeout struct {
 	UnfreezeTimeout *metav1.Duration `json:"unfreezeTimeout"`
 }
 
-// VirtualMachineMemoryDumpRequest represent the memory dump request phase and info
-type VirtualMachineMemoryDumpRequest struct {
-	// ClaimName is the name of the pvc that will contain the memory dump
-	ClaimName string `json:"claimName"`
-	// Phase represents the memory dump phase
-	Phase MemoryDumpPhase `json:"phase"`
-	// StartTimestamp represents the time the memory dump started
-	StartTimestamp *metav1.Time `json:"startTimestamp,omitempty"`
-	// EndTimestamp represents the time the memory dump was completed
-	EndTimestamp *metav1.Time `json:"endTimestamp,omitempty"`
-	// FileName represents the name of the output file
-	FileName *string `json:"fileName,omitempty"`
-	// Message is a detailed message about failure of the memory dump
-	Message string `json:"message,omitempty"`
-}
-
-type MemoryDumpPhase string
-
-const (
-	// The memorydump is during pvc Associating
-	MemoryDumpAssociating MemoryDumpPhase = "Associating"
-	// The memorydump is in progress
-	MemoryDumpInProgress MemoryDumpPhase = "InProgress"
-	// The memorydump is being unmounted
-	MemoryDumpUnmounting MemoryDumpPhase = "Unmounting"
-	// The memorydump is completed
-	MemoryDumpCompleted MemoryDumpPhase = "Completed"
-	// The memorydump is being unbound
-	MemoryDumpDissociating MemoryDumpPhase = "Dissociating"
-	// The memorydump failed
-	MemoryDumpFailed MemoryDumpPhase = "Failed"
-)
-
 // AddVolumeOptions is provided when dynamically hot plugging a volume and disk
 type AddVolumeOptions struct {
 	// Name represents the name that will be used to map the
@@ -2212,11 +2143,6 @@ type LogVerbosity struct {
 	NodeVerbosity map[string]uint `json:"nodeVerbosity,omitempty"`
 }
 
-const (
-	PCIResourcePrefix  = "PCI_RESOURCE"
-	MDevResourcePrefix = "MDEV_PCI_RESOURCE"
-)
-
 // PermittedHostDevices holds information about devices allowed for passthrough
 type PermittedHostDevices struct {
 	// +listType=atomic
@@ -2301,19 +2227,6 @@ type FlavorMatcher struct {
 	// Kind specifies which flavor resource is referenced.
 	// Allowed values are: "VirtualMachineFlavor" and "VirtualMachineClusterFlavor".
 	// If not specified, "VirtualMachineClusterFlavor" is used by default.
-	//
-	// +optional
-	Kind string `json:"kind,omitempty"`
-}
-
-// PreferenceMatcher references a set of preference that is used to fill fields in the VMI template.
-type PreferenceMatcher struct {
-	// Name is the name of the VirtualMachinePreference or VirtualMachineClusterPreference
-	Name string `json:"name"`
-
-	// Kind specifies which preference resource is referenced.
-	// Allowed values are: "VirtualMachinePreference" and "VirtualMachineClusterPreference".
-	// If not specified, "VirtualMachineClusterPreference" is used by default.
 	//
 	// +optional
 	Kind string `json:"kind,omitempty"`

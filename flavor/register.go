@@ -28,10 +28,4 @@ const (
 
 	ClusterSingularResourceName = "virtualmachineclusterflavor"
 	ClusterPluralResourceName   = ClusterSingularResourceName + "s"
-
-	SingularPreferenceResourceName = "virtualmachinepreference"
-	PluralPreferenceResourceName   = SingularPreferenceResourceName + "s"
-
-	ClusterSingularPreferenceResourceName = "virtualmachineclusterpreference"
-	ClusterPluralPreferenceResourceName   = ClusterSingularPreferenceResourceName + "s"
 )
