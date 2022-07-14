@@ -23,6 +23,7 @@ package v1alpha1
 
 import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
+
 	v1 "kubevirt.io/api/core/v1"
 )
 
