@@ -680,12 +680,6 @@ func (InterfaceMacvtap) SwaggerDoc() map[string]string {
 	}
 }
 
-func (InterfacePasst) SwaggerDoc() map[string]string {
-	return map[string]string{
-		"": "InterfacePasst connects to a given network.",
-	}
-}
-
 func (Port) SwaggerDoc() map[string]string {
 	return map[string]string{
 		"":         "Port represents a port to expose from the virtual machine.\nDefault protocol TCP.\nThe port field is mandatory",
