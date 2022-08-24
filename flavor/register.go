@@ -17,8 +17,9 @@
  *
  */
 
-// +k8s:deepcopy-gen=package
-// +groupName=instancetype.kubevirt.io
-// +k8s:openapi-gen=true
+package flavor
 
-package v1alpha1
+// GroupName is the group name used in this package
+const (
+	GroupName = "flavor.kubevirt.io"
+)

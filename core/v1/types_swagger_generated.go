@@ -25,7 +25,6 @@ func (VirtualMachineInstanceSpec) SwaggerDoc() map[string]string {
 		"affinity":                      "If affinity is specifies, obey all the affinity rules",
 		"schedulerName":                 "If specified, the VMI will be dispatched by specified scheduler.\nIf not specified, the VMI will be dispatched by default scheduler.\n+optional",
 		"tolerations":                   "If toleration is specified, obey all the toleration rules.",
-		"topologySpreadConstraints":     "TopologySpreadConstraints describes how a group of VMIs will be spread across a given topology\ndomains. K8s scheduler will schedule VMI pods in a way which abides by the constraints.\n+optional\n+patchMergeKey=topologyKey\n+patchStrategy=merge\n+listType=map\n+listMapKey=topologyKey\n+listMapKey=whenUnsatisfiable",
 		"evictionStrategy":              "EvictionStrategy can be set to \"LiveMigrate\" if the VirtualMachineInstance should be\nmigrated instead of shut-off in case of a node drain.\n\n+optional",
 		"startStrategy":                 "StartStrategy can be set to \"Paused\" if Virtual Machine should be started in paused state.\n\n+optional",
 		"terminationGracePeriodSeconds": "Grace period observed after signalling a VirtualMachineInstance to stop after which the VirtualMachineInstance is force terminated.",
@@ -74,7 +73,6 @@ func (VirtualMachineInstanceStatus) SwaggerDoc() map[string]string {
 		"fsFreezeStatus":                "FSFreezeStatus is the state of the fs of the guest\nit can be either frozen or thawed\n+optional",
 		"topologyHints":                 "+optional",
 		"virtualMachineRevisionName":    "VirtualMachineRevisionName is used to get the vm revision of the vmi when doing\nan online vm snapshot\n+optional",
-		"runtimeUser":                   "RuntimeUser is used to determine what user will be used in launcher\n+optional",
 	}
 }
 
@@ -101,17 +99,6 @@ func (VolumeStatus) SwaggerDoc() map[string]string {
 		"persistentVolumeClaimInfo": "PersistentVolumeClaimInfo is information about the PVC that handler requires during start flow",
 		"hotplugVolume":             "If the volume is hotplug, this will contain the hotplug status.",
 		"size":                      "Represents the size of the volume",
-		"memoryDumpVolume":          "If the volume is memorydump volume, this will contain the memorydump info.",
-	}
-}
-
-func (DomainMemoryDumpInfo) SwaggerDoc() map[string]string {
-	return map[string]string{
-		"":               "DomainMemoryDumpInfo represents the memory dump information",
-		"startTimestamp": "StartTimestamp is the time when the memory dump started",
-		"endTimestamp":   "EndTimestamp is the time when the memory dump completed",
-		"claimName":      "ClaimName is the name of the pvc the memory was dumped to",
-		"targetFileName": "TargetFileName is the name of the memory dump output",
 	}
 }
 
@@ -145,7 +132,6 @@ func (VirtualMachineInstanceNetworkInterface) SwaggerDoc() map[string]string {
 		"ipAddresses":   "List of all IP addresses of a Virtual Machine interface",
 		"interfaceName": "The interface name inside the Virtual Machine",
 		"infoSource":    "Specifies the origin of the interface data collected. values: domain, guest-agent, or both",
-		"queueCount":    "Specifies how many queues are allocated by MultiQueue",
 	}
 }
 
@@ -267,18 +253,9 @@ func (VirtualMachineInstanceMigrationSpec) SwaggerDoc() map[string]string {
 	}
 }
 
-func (VirtualMachineInstanceMigrationPhaseTransitionTimestamp) SwaggerDoc() map[string]string {
-	return map[string]string{
-		"":                         "VirtualMachineInstanceMigrationPhaseTransitionTimestamp gives a timestamp in relation to when a phase is set on a vmi",
-		"phase":                    "Phase is the status of the VirtualMachineInstanceMigrationPhase in kubernetes world. It is not the VirtualMachineInstanceMigrationPhase status, but partially correlates to it.",
-		"phaseTransitionTimestamp": "PhaseTransitionTimestamp is the timestamp of when the phase change occurred",
-	}
-}
-
 func (VirtualMachineInstanceMigrationStatus) SwaggerDoc() map[string]string {
 	return map[string]string{
-		"":                          "VirtualMachineInstanceMigration reprents information pertaining to a VMI's migration.",
-		"phaseTransitionTimestamps": "PhaseTransitionTimestamp is the timestamp of when the last phase change occurred\n+listType=atomic\n+optional",
+		"": "VirtualMachineInstanceMigration reprents information pertaining to a VMI's migration.",
 	}
 }
 
@@ -321,8 +298,7 @@ func (VirtualMachineSpec) SwaggerDoc() map[string]string {
 		"":                    "VirtualMachineSpec describes how the proper VirtualMachine\nshould look like",
 		"running":             "Running controls whether the associatied VirtualMachineInstance is created or not\nMutually exclusive with RunStrategy",
 		"runStrategy":         "Running state indicates the requested running state of the VirtualMachineInstance\nmutually exclusive with Running",
-		"instancetype":        "InstancetypeMatcher references a instancetype that is used to fill fields in Template",
-		"preference":          "PreferenceMatcher references a set of preference that is used to fill fields in Template",
+		"flavor":              "FlavorMatcher references a flavor that is used to fill fields in Template",
 		"template":            "Template is the direct specification of VirtualMachineInstance",
 		"dataVolumeTemplates": "dataVolumeTemplates is a list of dataVolumes that the VirtualMachineInstance template can reference.\nDataVolumes in this list are dynamically created for the VirtualMachine and are tied to the VirtualMachine's life-cycle.",
 	}
@@ -347,7 +323,6 @@ func (VirtualMachineStatus) SwaggerDoc() map[string]string {
 		"volumeRequests":         "VolumeRequests indicates a list of volumes add or remove from the VMI template and\nhotplug on an active running VMI.\n+listType=atomic",
 		"volumeSnapshotStatuses": "VolumeSnapshotStatuses indicates a list of statuses whether snapshotting is\nsupported by each volume.",
 		"startFailure":           "StartFailure tracks consecutive VMI startup failures for the purposes of\ncrash loop backoffs\n+nullable\n+optional",
-		"memoryDumpRequest":      "MemoryDumpRequest tracks memory dump request phase and info of getting a memory\ndump to the given pvc\n+nullable\n+optional",
 	}
 }
 
@@ -448,20 +423,19 @@ func (KubeVirtWorkloadUpdateStrategy) SwaggerDoc() map[string]string {
 
 func (KubeVirtSpec) SwaggerDoc() map[string]string {
 	return map[string]string{
-		"imageTag":                "The image tag to use for the continer images installed.\nDefaults to the same tag as the operator's container image.",
-		"imageRegistry":           "The image registry to pull the container images from\nDefaults to the same registry the operator's container image is pulled from.",
-		"imagePullPolicy":         "The ImagePullPolicy to use.",
-		"monitorNamespace":        "The namespace Prometheus is deployed in\nDefaults to openshift-monitor",
-		"serviceMonitorNamespace": "The namespace the service monitor will be deployed\n When ServiceMonitorNamespace is set, then we'll install the service monitor object in that namespace\notherwise we will use the monitoring namespace.",
-		"monitorAccount":          "The name of the Prometheus service account that needs read-access to KubeVirt endpoints\nDefaults to prometheus-k8s",
-		"workloadUpdateStrategy":  "WorkloadUpdateStrategy defines at the cluster level how to handle\nautomated workload updates",
-		"uninstallStrategy":       "Specifies if kubevirt can be deleted if workloads are still present.\nThis is mainly a precaution to avoid accidental data loss",
-		"productVersion":          "Designate the apps.kubevirt.io/version label for KubeVirt components.\nUseful if KubeVirt is included as part of a product.\nIf ProductVersion is not specified, KubeVirt's version will be used.",
-		"productName":             "Designate the apps.kubevirt.io/part-of label for KubeVirt components.\nUseful if KubeVirt is included as part of a product.\nIf ProductName is not specified, the part-of label will be omitted.",
-		"productComponent":        "Designate the apps.kubevirt.io/component label for KubeVirt components.\nUseful if KubeVirt is included as part of a product.\nIf ProductComponent is not specified, the component label default value is kubevirt.",
-		"configuration":           "holds kubevirt configurations.\nsame as the virt-configMap",
-		"infra":                   "selectors and tolerations that should apply to KubeVirt infrastructure components\n+optional",
-		"workloads":               "selectors and tolerations that should apply to KubeVirt workloads\n+optional",
+		"imageTag":               "The image tag to use for the continer images installed.\nDefaults to the same tag as the operator's container image.",
+		"imageRegistry":          "The image registry to pull the container images from\nDefaults to the same registry the operator's container image is pulled from.",
+		"imagePullPolicy":        "The ImagePullPolicy to use.",
+		"monitorNamespace":       "The namespace Prometheus is deployed in\nDefaults to openshift-monitor",
+		"monitorAccount":         "The name of the Prometheus service account that needs read-access to KubeVirt endpoints\nDefaults to prometheus-k8s",
+		"workloadUpdateStrategy": "WorkloadUpdateStrategy defines at the cluster level how to handle\nautomated workload updates",
+		"uninstallStrategy":      "Specifies if kubevirt can be deleted if workloads are still present.\nThis is mainly a precaution to avoid accidental data loss",
+		"productVersion":         "Designate the apps.kubevirt.io/version label for KubeVirt components.\nUseful if KubeVirt is included as part of a product.\nIf ProductVersion is not specified, KubeVirt's version will be used.",
+		"productName":            "Designate the apps.kubevirt.io/part-of label for KubeVirt components.\nUseful if KubeVirt is included as part of a product.\nIf ProductName is not specified, the part-of label will be omitted.",
+		"productComponent":       "Designate the apps.kubevirt.io/component label for KubeVirt components.\nUseful if KubeVirt is included as part of a product.\nIf ProductComponent is not specified, the component label default value is kubevirt.",
+		"configuration":          "holds kubevirt configurations.\nsame as the virt-configMap",
+		"infra":                  "selectors and tolerations that should apply to KubeVirt infrastructure components\n+optional",
+		"workloads":              "selectors and tolerations that should apply to KubeVirt workloads\n+optional",
 	}
 }
 
@@ -613,19 +587,6 @@ func (FreezeUnfreezeTimeout) SwaggerDoc() map[string]string {
 	}
 }
 
-func (VirtualMachineMemoryDumpRequest) SwaggerDoc() map[string]string {
-	return map[string]string{
-		"":               "VirtualMachineMemoryDumpRequest represent the memory dump request phase and info",
-		"claimName":      "ClaimName is the name of the pvc that will contain the memory dump",
-		"phase":          "Phase represents the memory dump phase",
-		"remove":         "Remove represents request of dissociating the memory dump pvc\n+optional",
-		"startTimestamp": "StartTimestamp represents the time the memory dump started\n+optional",
-		"endTimestamp":   "EndTimestamp represents the time the memory dump was completed\n+optional",
-		"fileName":       "FileName represents the name of the output file\n+optional",
-		"message":        "Message is a detailed message about failure of the memory dump\n+optional",
-	}
-}
-
 func (AddVolumeOptions) SwaggerDoc() map[string]string {
 	return map[string]string{
 		"":             "AddVolumeOptions is provided when dynamically hot plugging a volume and disk",
@@ -672,7 +633,6 @@ func (ReloadableComponentConfiguration) SwaggerDoc() map[string]string {
 func (KubeVirtConfiguration) SwaggerDoc() map[string]string {
 	return map[string]string{
 		"":                            "KubeVirtConfiguration holds all kubevirt configurations",
-		"evictionStrategy":            "EvictionStrategy defines at the cluster level if the VirtualMachineInstance should be\nmigrated instead of shut-off in case of a node drain. If the VirtualMachineInstance specific\nfield is set it overrides the cluster level one.",
 		"supportedGuestAgentVersions": "deprecated",
 	}
 }
@@ -710,7 +670,7 @@ func (LogVerbosity) SwaggerDoc() map[string]string {
 
 func (PermittedHostDevices) SwaggerDoc() map[string]string {
 	return map[string]string{
-		"":                "PermittedHostDevices holds information about devices allowed for passthrough",
+		"":                "PermittedHostDevices holds inforamtion about devices allowed for passthrough",
 		"pciHostDevices":  "+listType=atomic",
 		"mediatedDevices": "+listType=atomic",
 	}
@@ -733,7 +693,7 @@ func (MediatedHostDevice) SwaggerDoc() map[string]string {
 
 func (MediatedDevicesConfiguration) SwaggerDoc() map[string]string {
 	return map[string]string{
-		"":                        "MediatedDevicesConfiguration holds information about MDEV types to be defined, if available",
+		"":                        "MediatedDevicesConfiguration holds inforamtion about MDEV types to be defined, if available",
 		"mediatedDevicesTypes":    "+listType=atomic",
 		"nodeMediatedDeviceTypes": "+optional\n+listType=atomic",
 	}
@@ -741,7 +701,7 @@ func (MediatedDevicesConfiguration) SwaggerDoc() map[string]string {
 
 func (NodeMediatedDeviceTypesConfig) SwaggerDoc() map[string]string {
 	return map[string]string{
-		"":                     "NodeMediatedDeviceTypesConfig holds information about MDEV types to be defined in a specifc node that matches the NodeSelector field.\n+k8s:openapi-gen=true",
+		"":                     "NodeMediatedDeviceTypesConfig holds inforamtion about MDEV types to be defined in a specifc node that matches the NodeSelector field.\n+k8s:openapi-gen=true",
 		"nodeSelector":         "NodeSelector is a selector which must be true for the vmi to fit on a node.\nSelector which must match a node's labels for the vmi to be scheduled on that node.\nMore info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/",
 		"mediatedDevicesTypes": "+listType=atomic",
 	}
@@ -771,20 +731,11 @@ func (ClusterProfilerRequest) SwaggerDoc() map[string]string {
 	return map[string]string{}
 }
 
-func (InstancetypeMatcher) SwaggerDoc() map[string]string {
+func (FlavorMatcher) SwaggerDoc() map[string]string {
 	return map[string]string{
-		"":             "InstancetypeMatcher references a instancetype that is used to fill fields in the VMI template.",
-		"name":         "Name is the name of the VirtualMachineInstancetype or VirtualMachineClusterInstancetype",
-		"kind":         "Kind specifies which instancetype resource is referenced.\nAllowed values are: \"VirtualMachineInstancetype\" and \"VirtualMachineClusterInstancetype\".\nIf not specified, \"VirtualMachineClusterInstancetype\" is used by default.\n\n+optional",
-		"revisionName": "RevisionName specifies a ControllerRevision containing a specific copy of the\nVirtualMachineInstancetype or VirtualMachineClusterInstancetype to be used. This is initially\ncaptured the first time the instancetype is applied to the VirtualMachineInstance.\n\n+optional",
-	}
-}
-
-func (PreferenceMatcher) SwaggerDoc() map[string]string {
-	return map[string]string{
-		"":             "PreferenceMatcher references a set of preference that is used to fill fields in the VMI template.",
-		"name":         "Name is the name of the VirtualMachinePreference or VirtualMachineClusterPreference",
-		"kind":         "Kind specifies which preference resource is referenced.\nAllowed values are: \"VirtualMachinePreference\" and \"VirtualMachineClusterPreference\".\nIf not specified, \"VirtualMachineClusterPreference\" is used by default.\n\n+optional",
-		"revisionName": "RevisionName specifies a ControllerRevision containing a specific copy of the\nVirtualMachinePreference or VirtualMachineClusterPreference to be used. This is\ninitially captured the first time the instancetype is applied to the VirtualMachineInstance.\n\n+optional",
+		"":        "FlavorMatcher references a flavor that is used to fill fields in the VMI template.",
+		"name":    "Name is the name of the VirtualMachineFlavor or VirtualMachineClusterFlavor",
+		"kind":    "Kind specifies which flavor resource is referenced.\nAllowed values are: \"VirtualMachineFlavor\" and \"VirtualMachineClusterFlavor\".\nIf not specified, \"VirtualMachineClusterFlavor\" is used by default.\n\n+optional",
+		"profile": "Profile is the name of a custom profile in the flavor. If left empty, the default profile is used.\n+optional",
 	}
 }

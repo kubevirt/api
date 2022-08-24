@@ -229,7 +229,7 @@ func (Devices) SwaggerDoc() map[string]string {
 	return map[string]string{
 		"useVirtioTransitional":      "Fall back to legacy virtio 0.9 support if virtio bus is selected on devices.\nThis is helpful for old machines like CentOS6 or RHEL6 which\ndo not understand virtio_non_transitional (virtio 1.0).",
 		"disableHotplug":             "DisableHotplug disabled the ability to hotplug disks.",
-		"disks":                      "Disks describes disks, cdroms and luns which are connected to the vmi.",
+		"disks":                      "Disks describes disks, cdroms, floppy and luns which are connected to the vmi.",
 		"watchdog":                   "Watchdog describes a watchdog device which can be added to the vmi.",
 		"interfaces":                 "Interfaces describe network interfaces which are added to the vmi.",
 		"inputs":                     "Inputs describe input devices",
@@ -237,7 +237,6 @@ func (Devices) SwaggerDoc() map[string]string {
 		"autoattachGraphicsDevice":   "Whether to attach the default graphics device or not.\nVNC will not be available if set to false. Defaults to true.",
 		"autoattachSerialConsole":    "Whether to attach the default serial console or not.\nSerial console access will not be available if set to false. Defaults to true.",
 		"autoattachMemBalloon":       "Whether to attach the Memory balloon device with default period.\nPeriod can be adjusted in virt-config.\nDefaults to true.\n+optional",
-		"autoattachInputDevice":      "Whether to attach an Input Device.\nDefaults to false.\n+optional",
 		"rng":                        "Whether to have random number generator from host\n+optional",
 		"blockMultiQueue":            "Whether or not to enable virtio multi-queue for block devices.\nDefaults to false.\n+optional",
 		"networkInterfaceMultiqueue": "If specified, virtual network interfaces configured with a virtio bus will also enable the vhost multiqueue feature for network devices. The number of queues created depends on additional factors of the VirtualMachineInstance, like the number of guest CPUs.\n+optional",
@@ -246,7 +245,6 @@ func (Devices) SwaggerDoc() map[string]string {
 		"hostDevices":                "Whether to attach a host device to the vmi.\n+optional\n+listType=atomic",
 		"clientPassthrough":          "To configure and access client devices such as redirecting USB\n+optional",
 		"sound":                      "Whether to emulate a sound device.\n+optional",
-		"tpm":                        "Whether to emulate a TPM device.\n+optional",
 	}
 }
 
@@ -262,10 +260,6 @@ func (SoundDevice) SwaggerDoc() map[string]string {
 		"name":  "User's defined name for this sound device",
 		"model": "We only support ich9 or ac97.\nIf SoundDevice is not set: No sound card is emulated.\nIf SoundDevice is set but Model is not: ich9\n+optional",
 	}
-}
-
-func (TPMDevice) SwaggerDoc() map[string]string {
-	return map[string]string{}
 }
 
 func (Input) SwaggerDoc() map[string]string {
@@ -290,7 +284,6 @@ func (FilesystemVirtiofs) SwaggerDoc() map[string]string {
 func (GPU) SwaggerDoc() map[string]string {
 	return map[string]string{
 		"name": "Name of the GPU device as exposed by a device plugin",
-		"tag":  "If specified, the virtual network interface address and its tag will be provided to the guest via config drive\n+optional",
 	}
 }
 
@@ -308,7 +301,6 @@ func (VGPUDisplayOptions) SwaggerDoc() map[string]string {
 func (HostDevice) SwaggerDoc() map[string]string {
 	return map[string]string{
 		"deviceName": "DeviceName is the resource name of the host device exposed by a device plugin",
-		"tag":        "If specified, the virtual network interface address and its tag will be provided to the guest via config drive\n+optional",
 	}
 }
 
@@ -322,7 +314,6 @@ func (Disk) SwaggerDoc() map[string]string {
 		"io":                "IO specifies which QEMU disk IO mode should be used.\nSupported values are: native, default, threads.\n+optional",
 		"tag":               "If specified, disk address and its tag will be provided to the guest via config drive metadata\n+optional",
 		"blockSize":         "If specified, the virtual disk will be presented with the given block sizes.\n+optional",
-		"shareable":         "If specified the disk is made sharable and multiple write from different VMs are permitted\n+optional",
 	}
 }
 
@@ -340,16 +331,17 @@ func (BlockSize) SwaggerDoc() map[string]string {
 
 func (DiskDevice) SwaggerDoc() map[string]string {
 	return map[string]string{
-		"":      "Represents the target of a volume to mount.\nOnly one of its members may be specified.",
-		"disk":  "Attach a volume as a disk to the vmi.",
-		"lun":   "Attach a volume as a LUN to the vmi.",
-		"cdrom": "Attach a volume as a cdrom to the vmi.",
+		"":       "Represents the target of a volume to mount.\nOnly one of its members may be specified.",
+		"disk":   "Attach a volume as a disk to the vmi.",
+		"lun":    "Attach a volume as a LUN to the vmi.",
+		"floppy": "Attach a volume as a floppy to the vmi.",
+		"cdrom":  "Attach a volume as a cdrom to the vmi.",
 	}
 }
 
 func (DiskTarget) SwaggerDoc() map[string]string {
 	return map[string]string{
-		"bus":        "Bus indicates the type of disk device to emulate.\nsupported values: virtio, sata, scsi, usb.",
+		"bus":        "Bus indicates the type of disk device to emulate.\nsupported values: virtio, sata, scsi.",
 		"readonly":   "ReadOnly.\nDefaults to false.",
 		"pciAddress": "If specified, the virtual disk will be placed on the guests pci address with the specified PCI address. For example: 0000:81:01.10\n+optional",
 	}
@@ -369,6 +361,13 @@ func (LunTarget) SwaggerDoc() map[string]string {
 	return map[string]string{
 		"bus":      "Bus indicates the type of disk device to emulate.\nsupported values: virtio, sata, scsi.",
 		"readonly": "ReadOnly.\nDefaults to false.",
+	}
+}
+
+func (FloppyTarget) SwaggerDoc() map[string]string {
+	return map[string]string{
+		"readonly": "ReadOnly.\nDefaults to false.",
+		"tray":     "Tray indicates if the tray of the device is open or closed.\nAllowed values are \"open\" and \"closed\".\nDefaults to closed.\n+optional",
 	}
 }
 
@@ -404,7 +403,6 @@ func (VolumeSource) SwaggerDoc() map[string]string {
 		"downwardAPI":           "DownwardAPI represents downward API about the pod that should populate this volume\n+optional",
 		"serviceAccount":        "ServiceAccountVolumeSource represents a reference to a service account.\nThere can only be one volume of this type!\nMore info: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/\n+optional",
 		"downwardMetrics":       "DownwardMetrics adds a very small disk to VMIs which contains a limited view of host and guest\nmetrics. The disk content is compatible with vhostmd (https://github.com/vhostmd/vhostmd) and vm-dump-metrics.",
-		"memoryDump":            "MemoryDump is attached to the virt launcher and is populated with a memory dump of the vmi",
 	}
 }
 
@@ -428,10 +426,6 @@ func (PersistentVolumeClaimVolumeSource) SwaggerDoc() map[string]string {
 		"":             "PersistentVolumeClaimVolumeSource represents a reference to a PersistentVolumeClaim in the same namespace.\nDirectly attached to the vmi via qemu.\nMore info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims",
 		"hotpluggable": "Hotpluggable indicates whether the volume can be hotplugged and hotunplugged.\n+optional",
 	}
-}
-
-func (MemoryDumpVolumeSource) SwaggerDoc() map[string]string {
-	return map[string]string{}
 }
 
 func (EphemeralVolumeSource) SwaggerDoc() map[string]string {
@@ -652,39 +646,23 @@ func (InterfaceBindingMethod) SwaggerDoc() map[string]string {
 }
 
 func (InterfaceBridge) SwaggerDoc() map[string]string {
-	return map[string]string{
-		"": "InterfaceBridge connects to a given network via a linux bridge.",
-	}
+	return map[string]string{}
 }
 
 func (InterfaceSlirp) SwaggerDoc() map[string]string {
-	return map[string]string{
-		"": "InterfaceSlirp connects to a given network using QEMU user networking mode.",
-	}
+	return map[string]string{}
 }
 
 func (InterfaceMasquerade) SwaggerDoc() map[string]string {
-	return map[string]string{
-		"": "InterfaceMasquerade connects to a given network using netfilter rules to nat the traffic.",
-	}
+	return map[string]string{}
 }
 
 func (InterfaceSRIOV) SwaggerDoc() map[string]string {
-	return map[string]string{
-		"": "InterfaceSRIOV connects to a given network by passing-through an SR-IOV PCI device via vfio.",
-	}
+	return map[string]string{}
 }
 
 func (InterfaceMacvtap) SwaggerDoc() map[string]string {
-	return map[string]string{
-		"": "InterfaceMacvtap connects to a given network by extending the Kubernetes node's L2 networks via a macvtap interface.",
-	}
-}
-
-func (InterfacePasst) SwaggerDoc() map[string]string {
-	return map[string]string{
-		"": "InterfacePasst connects to a given network.",
-	}
+	return map[string]string{}
 }
 
 func (Port) SwaggerDoc() map[string]string {

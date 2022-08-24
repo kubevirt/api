@@ -69,6 +69,7 @@ func SetDefaults_FeatureVendorID(obj *FeatureVendorID) {
 func SetDefaults_DiskDevice(obj *DiskDevice) {
 	if obj.Disk == nil &&
 		obj.CDRom == nil &&
+		obj.Floppy == nil &&
 		obj.LUN == nil {
 		obj.Disk = &DiskTarget{}
 	}
@@ -84,6 +85,12 @@ func SetDefaults_CDRomTarget(obj *CDRomTarget) {
 	if obj.ReadOnly == nil {
 		obj.ReadOnly = _true
 	}
+	if obj.Tray == "" {
+		obj.Tray = TrayStateClosed
+	}
+}
+
+func SetDefaults_FloppyTarget(obj *FloppyTarget) {
 	if obj.Tray == "" {
 		obj.Tray = TrayStateClosed
 	}
@@ -120,28 +127,29 @@ func SetDefaults_VirtualMachineInstance(obj *VirtualMachineInstance) {
 	}
 
 	setDefaults_Disk(obj)
-	setDefaults_Input(obj)
 	SetDefaults_Probe(obj.Spec.ReadinessProbe)
 	SetDefaults_Probe(obj.Spec.LivenessProbe)
 }
 
 func setDefaults_Disk(obj *VirtualMachineInstance) {
+	// Setting SATA as the default bus since it is typically supported out of the box by
+	// guest operating systems (we support only q35 and therefore IDE is not supported)
+	// TODO: consider making this OS-specific (VIRTIO for linux, SATA for others)
+	bus := "sata"
+
 	for i := range obj.Spec.Domain.Devices.Disks {
 		disk := &obj.Spec.Domain.Devices.Disks[i].DiskDevice
+
 		SetDefaults_DiskDevice(disk)
-	}
-}
 
-func setDefaults_Input(obj *VirtualMachineInstance) {
-	for i := range obj.Spec.Domain.Devices.Inputs {
-		input := &obj.Spec.Domain.Devices.Inputs[i]
-
-		if input.Bus == "" {
-			input.Bus = InputBusUSB
+		if disk.Disk != nil && disk.Disk.Bus == "" {
+			disk.Disk.Bus = bus
 		}
-
-		if input.Type == "" {
-			input.Type = InputTypeTablet
+		if disk.CDRom != nil && disk.CDRom.Bus == "" {
+			disk.CDRom.Bus = bus
+		}
+		if disk.LUN != nil && disk.LUN.Bus == "" {
+			disk.LUN.Bus = bus
 		}
 	}
 }

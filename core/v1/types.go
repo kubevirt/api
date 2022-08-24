@@ -100,15 +100,7 @@ type VirtualMachineInstanceSpec struct {
 	SchedulerName string `json:"schedulerName,omitempty"`
 	// If toleration is specified, obey all the toleration rules.
 	Tolerations []k8sv1.Toleration `json:"tolerations,omitempty"`
-	// TopologySpreadConstraints describes how a group of VMIs will be spread across a given topology
-	// domains. K8s scheduler will schedule VMI pods in a way which abides by the constraints.
-	// +optional
-	// +patchMergeKey=topologyKey
-	// +patchStrategy=merge
-	// +listType=map
-	// +listMapKey=topologyKey
-	// +listMapKey=whenUnsatisfiable
-	TopologySpreadConstraints []k8sv1.TopologySpreadConstraint `json:"topologySpreadConstraints,omitempty" patchStrategy:"merge" patchMergeKey:"topologyKey"`
+
 	// EvictionStrategy can be set to "LiveMigrate" if the VirtualMachineInstance should be
 	// migrated instead of shut-off in case of a node drain.
 	//
@@ -257,10 +249,6 @@ type VirtualMachineInstanceStatus struct {
 	// an online vm snapshot
 	// +optional
 	VirtualMachineRevisionName string `json:"virtualMachineRevisionName,omitempty"`
-
-	// RuntimeUser is used to determine what user will be used in launcher
-	// +optional
-	RuntimeUser uint64 `json:"runtimeUser"`
 }
 
 // PersistentVolumeClaimInfo contains the relavant information virt-handler needs cached about a PVC
@@ -311,20 +299,6 @@ type VolumeStatus struct {
 	HotplugVolume *HotplugVolumeStatus `json:"hotplugVolume,omitempty"`
 	// Represents the size of the volume
 	Size int64 `json:"size,omitempty"`
-	// If the volume is memorydump volume, this will contain the memorydump info.
-	MemoryDumpVolume *DomainMemoryDumpInfo `json:"memoryDumpVolume,omitempty"`
-}
-
-// DomainMemoryDumpInfo represents the memory dump information
-type DomainMemoryDumpInfo struct {
-	// StartTimestamp is the time when the memory dump started
-	StartTimestamp *metav1.Time `json:"startTimestamp,omitempty"`
-	// EndTimestamp is the time when the memory dump completed
-	EndTimestamp *metav1.Time `json:"endTimestamp,omitempty"`
-	// ClaimName is the name of the pvc the memory was dumped to
-	ClaimName string `json:"claimName,omitempty"`
-	// TargetFileName is the name of the memory dump output
-	TargetFileName string `json:"targetFileName,omitempty"`
 }
 
 // HotplugVolumeStatus represents the hotplug status of the volume
@@ -353,12 +327,6 @@ const (
 	HotplugVolumeDetaching VolumePhase = "Detaching"
 	// HotplugVolumeUnMounted means the volume has been unmounted from the virt-launcer pod.
 	HotplugVolumeUnMounted VolumePhase = "UnMountedFromPod"
-	// MemoryDumpVolumeCompleted means that the requested memory dump was completed and the dump is ready in the volume
-	MemoryDumpVolumeCompleted VolumePhase = "MemoryDumpCompleted"
-	// MemoryDumpVolumeInProgress means that the volume for the memory dump was attached, and now the command is being triggered
-	MemoryDumpVolumeInProgress VolumePhase = "MemoryDumpInProgress"
-	// MemoryDumpVolumeInProgress means that the volume for the memory dump was attached, and now the command is being triggered
-	MemoryDumpVolumeFailed VolumePhase = "MemoryDumpFailed"
 )
 
 func (v *VirtualMachineInstance) IsScheduling() bool {
@@ -384,6 +352,10 @@ func (v *VirtualMachineInstance) IsMigratable() bool {
 		}
 	}
 	return false
+}
+
+func (v *VirtualMachineInstance) IsEvictable() bool {
+	return v.Spec.EvictionStrategy != nil && *v.Spec.EvictionStrategy == EvictionStrategyLiveMigrate
 }
 
 func (v *VirtualMachineInstance) IsFinal() bool {
@@ -560,8 +532,6 @@ type VirtualMachineInstanceNetworkInterface struct {
 	InterfaceName string `json:"interfaceName,omitempty"`
 	// Specifies the origin of the interface data collected. values: domain, guest-agent, or both
 	InfoSource string `json:"infoSource,omitempty"`
-	// Specifies how many queues are allocated by MultiQueue
-	QueueCount int32 `json:"queueCount,omitempty"`
 }
 
 type VirtualMachineInstanceGuestOSInfo struct {
@@ -596,7 +566,6 @@ type VirtualMachineInstanceMigrationState struct {
 	// The time the migration action ended
 	// +nullable
 	EndTimestamp *metav1.Time `json:"endTimestamp,omitempty"`
-
 	// The Target Node has seen the Domain Start Event
 	TargetNodeDomainDetected bool `json:"targetNodeDomainDetected,omitempty"`
 	// The address of the target node to use for the migration
@@ -699,10 +668,9 @@ const (
 )
 
 const (
-	// AppLabel and AppName labels marks resources that belong to KubeVirt. An optional value
+	// This label marks resources that belong to KubeVirt. An optional value
 	// may indicate which specific KubeVirt component a resource belongs to.
 	AppLabel string = "kubevirt.io"
-	AppName  string = "name"
 	// This annotation is used to match virtual machine instances represented as
 	// libvirt XML domains with their pods. Among other things, the annotation is
 	// used to detect virtual machines with dead pods. Used on Pod.
@@ -829,7 +797,7 @@ const (
 	MigrationSelectorLabel = "kubevirt.io/vmi-name"
 
 	// This annotation represents vmi running nonroot implementation
-	DeprecatedNonRootVMIAnnotation = "kubevirt.io/nonroot"
+	NonRootVMIAnnotation = "kubevirt.io/nonroot"
 
 	// This annotation is to keep virt launcher container alive when an VMI encounters a failure for debugging purpose
 	KeepLauncherAfterFailureAnnotation string = "kubevirt.io/keep-launcher-alive-after-failure"
@@ -845,11 +813,6 @@ const (
 	// This exists for functional testing
 	MigrationPendingPodTimeoutSecondsAnnotation string = "kubevirt.io/migrationPendingPodTimeoutSeconds"
 
-	// CustomLibvirtLogFiltersAnnotation can be used to customized libvirt log filters. Example value could be
-	// "3:remote 4:event 3:util.json 3:util.object 3:util.dbus 3:util.netlink 3:node_device 3:rpc 3:access 1:*".
-	// For more info: https://libvirt.org/kbase/debuglogs.html
-	CustomLibvirtLogFiltersAnnotation string = "kubevirt.io/libvirt-log-filters"
-
 	// RealtimeLabel marks the node as capable of running realtime workloads
 	RealtimeLabel string = "kubevirt.io/realtime"
 
@@ -857,31 +820,17 @@ const (
 	// It's used as a readiness gate to prevent paused VMs from being marked as ready.
 	VirtualMachineUnpaused k8sv1.PodConditionType = "kubevirt.io/virtual-machine-unpaused"
 
+	// VirtualMahcineTemplateHash is used by the pool controller to determine when a VM needs to be updated
+	VirtualMachineTemplateHash string = "kubevirt.io/vm-template-hash"
+
+	// VirtualMahcineInstanceTemplateHash is used by the pool controller to determine when a VMI needs to be updated
+	VirtualMachineInstanceTemplateHash string = "kubevirt.io/vmi-template-hash"
+
 	// SEVLabel marks the node as capable of running workloads with SEV
 	SEVLabel string = "kubevirt.io/sev"
 
-	// InstancetypeAnnotation is the name of a VirtualMachineInstancetype
-	InstancetypeAnnotation string = "kubevirt.io/instancetype-name"
-
-	// ClusterInstancetypeAnnotation is the name of a VirtualMachineClusterInstancetype
-	ClusterInstancetypeAnnotation string = "kubevirt.io/cluster-instancetype-name"
-
-	// InstancetypeAnnotation is the name of a VirtualMachinePreference
-	PreferenceAnnotation string = "kubevirt.io/preference-name"
-
-	// ClusterInstancetypeAnnotation is the name of a VirtualMachinePreferenceInstancetype
-	ClusterPreferenceAnnotation string = "kubevirt.io/cluster-preference-name"
-
-	// VirtualMachinePoolRevisionName is used to store the vmpool revision's name this object
-	// originated from.
-	VirtualMachinePoolRevisionName string = "kubevirt.io/vm-pool-revision-name"
-
 	// VirtualMachineNameLabel is the name of the Virtual Machine
 	VirtualMachineNameLabel string = "vm.kubevirt.io/name"
-
-	// PVCMemoryDumpAnnotation is the name of the memory dump representing the vm name,
-	// pvc name and the timestamp the memory dump was collected
-	PVCMemoryDumpAnnotation string = "kubevirt.io/memory-dump"
 )
 
 func NewVMI(name string, uid types.UID) *VirtualMachineInstance {
@@ -1143,22 +1092,10 @@ type VirtualMachineInstanceMigrationSpec struct {
 	VMIName string `json:"vmiName,omitempty" valid:"required"`
 }
 
-// VirtualMachineInstanceMigrationPhaseTransitionTimestamp gives a timestamp in relation to when a phase is set on a vmi
-type VirtualMachineInstanceMigrationPhaseTransitionTimestamp struct {
-	// Phase is the status of the VirtualMachineInstanceMigrationPhase in kubernetes world. It is not the VirtualMachineInstanceMigrationPhase status, but partially correlates to it.
-	Phase VirtualMachineInstanceMigrationPhase `json:"phase,omitempty"`
-	// PhaseTransitionTimestamp is the timestamp of when the phase change occurred
-	PhaseTransitionTimestamp metav1.Time `json:"phaseTransitionTimestamp,omitempty"`
-}
-
 // VirtualMachineInstanceMigration reprents information pertaining to a VMI's migration.
 type VirtualMachineInstanceMigrationStatus struct {
 	Phase      VirtualMachineInstanceMigrationPhase       `json:"phase,omitempty"`
 	Conditions []VirtualMachineInstanceMigrationCondition `json:"conditions,omitempty"`
-	// PhaseTransitionTimestamp is the timestamp of when the last phase change occurred
-	// +listType=atomic
-	// +optional
-	PhaseTransitionTimestamps []VirtualMachineInstanceMigrationPhaseTransitionTimestamp `json:"phaseTransitionTimestamps,omitempty"`
 }
 
 // VirtualMachineInstanceMigrationPhase is a label for the condition of a VirtualMachineInstanceMigration at the current time.
@@ -1293,9 +1230,6 @@ const (
 	// VMI will initially be running--and restarted if a failure occurs.
 	// It will not be restarted upon successful completion.
 	RunStrategyRerunOnFailure VirtualMachineRunStrategy = "RerunOnFailure"
-	// VMI will run once and not be restarted upon completion regardless
-	// if the completion is of phase Failure or Success
-	RunStrategyOnce VirtualMachineRunStrategy = "Once"
 )
 
 // VirtualMachineSpec describes how the proper VirtualMachine
@@ -1309,11 +1243,8 @@ type VirtualMachineSpec struct {
 	// mutually exclusive with Running
 	RunStrategy *VirtualMachineRunStrategy `json:"runStrategy,omitempty" optional:"true"`
 
-	// InstancetypeMatcher references a instancetype that is used to fill fields in Template
-	Instancetype *InstancetypeMatcher `json:"instancetype,omitempty" optional:"true"`
-
-	// PreferenceMatcher references a set of preference that is used to fill fields in Template
-	Preference *PreferenceMatcher `json:"preference,omitempty" optional:"true"`
+	// FlavorMatcher references a flavor that is used to fill fields in Template
+	Flavor *FlavorMatcher `json:"flavor,omitempty" optional:"true"`
 
 	// Template is the direct specification of VirtualMachineInstance
 	Template *VirtualMachineInstanceTemplateSpec `json:"template"`
@@ -1372,6 +1303,8 @@ const (
 	VirtualMachineStatusImagePullBackOff VirtualMachinePrintableStatus = "ImagePullBackOff"
 	// VirtualMachineStatusPvcNotFound indicates that the virtual machine references a PVC volume which doesn't exist.
 	VirtualMachineStatusPvcNotFound VirtualMachinePrintableStatus = "ErrorPvcNotFound"
+	// VirtualMachineStatusDataVolumeNotFound indicates that the virtual machine references a DataVolume volume which doesn't exist.
+	VirtualMachineStatusDataVolumeNotFound VirtualMachinePrintableStatus = "ErrorDataVolumeNotFound"
 	// VirtualMachineStatusDataVolumeError indicates that an error has been reported by one of the DataVolumes
 	// referenced by the virtual machines.
 	VirtualMachineStatusDataVolumeError VirtualMachinePrintableStatus = "DataVolumeError"
@@ -1420,12 +1353,6 @@ type VirtualMachineStatus struct {
 	// +nullable
 	// +optional
 	StartFailure *VirtualMachineStartFailure `json:"startFailure,omitempty" optional:"true"`
-
-	// MemoryDumpRequest tracks memory dump request phase and info of getting a memory
-	// dump to the given pvc
-	// +nullable
-	// +optional
-	MemoryDumpRequest *VirtualMachineMemoryDumpRequest `json:"memoryDumpRequest,omitempty" optional:"true"`
 }
 
 type VolumeSnapshotStatus struct {
@@ -1502,8 +1429,6 @@ const (
 	SlirpInterface NetworkInterfaceType = "slirp"
 	// Virtual machine instance masquerade interface
 	MasqueradeInterface NetworkInterfaceType = "masquerade"
-	// Virtual machine instance passt interface
-	PasstInterface NetworkInterfaceType = "passt"
 )
 
 type DriverCache string
@@ -1515,8 +1440,6 @@ const (
 	CacheNone DriverCache = "none"
 	// CacheWriteThrough - I/O from the guest is cached on the host but written through to the physical medium.
 	CacheWriteThrough DriverCache = "writethrough"
-	// CacheWriteBack - I/O from the guest is cached on the host.
-	CacheWriteBack DriverCache = "writeback"
 
 	// IOThreads - User mode based threads with a shared lock that perform I/O tasks. Can impact performance but offers
 	// more predictable behaviour. This method is also takes fewer CPU cycles to submit I/O requests.
@@ -1695,11 +1618,6 @@ type KubeVirtSpec struct {
 	// Defaults to openshift-monitor
 	MonitorNamespace string `json:"monitorNamespace,omitempty"`
 
-	// The namespace the service monitor will be deployed
-	//  When ServiceMonitorNamespace is set, then we'll install the service monitor object in that namespace
-	// otherwise we will use the monitoring namespace.
-	ServiceMonitorNamespace string `json:"serviceMonitorNamespace,omitempty"`
-
 	// The name of the Prometheus service account that needs read-access to KubeVirt endpoints
 	// Defaults to prometheus-k8s
 	MonitorAccount string `json:"monitorAccount,omitempty"`
@@ -1818,7 +1736,6 @@ type KubeVirtStatus struct {
 	ObservedDeploymentConfig                string              `json:"observedDeploymentConfig,omitempty" optional:"true"`
 	ObservedDeploymentID                    string              `json:"observedDeploymentID,omitempty" optional:"true"`
 	OutdatedVirtualMachineInstanceWorkloads *int                `json:"outdatedVirtualMachineInstanceWorkloads,omitempty" optional:"true"`
-	ObservedGeneration                      *int64              `json:"observedGeneration,omitempty"`
 	// +listType=atomic
 	Generations []GenerationStatus `json:"generations,omitempty" optional:"true"`
 }
@@ -1871,9 +1788,7 @@ const (
 )
 
 const (
-	EvictionStrategyNone        EvictionStrategy = "None"
 	EvictionStrategyLiveMigrate EvictionStrategy = "LiveMigrate"
-	EvictionStrategyExternal    EvictionStrategy = "External"
 )
 
 // RestartOptions may be provided when deleting an API object.
@@ -2053,46 +1968,6 @@ type FreezeUnfreezeTimeout struct {
 	UnfreezeTimeout *metav1.Duration `json:"unfreezeTimeout"`
 }
 
-// VirtualMachineMemoryDumpRequest represent the memory dump request phase and info
-type VirtualMachineMemoryDumpRequest struct {
-	// ClaimName is the name of the pvc that will contain the memory dump
-	ClaimName string `json:"claimName"`
-	// Phase represents the memory dump phase
-	Phase MemoryDumpPhase `json:"phase"`
-	// Remove represents request of dissociating the memory dump pvc
-	// +optional
-	Remove bool `json:"remove,omitempty"`
-	// StartTimestamp represents the time the memory dump started
-	// +optional
-	StartTimestamp *metav1.Time `json:"startTimestamp,omitempty"`
-	// EndTimestamp represents the time the memory dump was completed
-	// +optional
-	EndTimestamp *metav1.Time `json:"endTimestamp,omitempty"`
-	// FileName represents the name of the output file
-	// +optional
-	FileName *string `json:"fileName,omitempty"`
-	// Message is a detailed message about failure of the memory dump
-	// +optional
-	Message string `json:"message,omitempty"`
-}
-
-type MemoryDumpPhase string
-
-const (
-	// The memorydump is during pvc Associating
-	MemoryDumpAssociating MemoryDumpPhase = "Associating"
-	// The memorydump is in progress
-	MemoryDumpInProgress MemoryDumpPhase = "InProgress"
-	// The memorydump is being unmounted
-	MemoryDumpUnmounting MemoryDumpPhase = "Unmounting"
-	// The memorydump is completed
-	MemoryDumpCompleted MemoryDumpPhase = "Completed"
-	// The memorydump is being unbound
-	MemoryDumpDissociating MemoryDumpPhase = "Dissociating"
-	// The memorydump failed
-	MemoryDumpFailed MemoryDumpPhase = "Failed"
-)
-
 // AddVolumeOptions is provided when dynamically hot plugging a volume and disk
 type AddVolumeOptions struct {
 	// Name represents the name that will be used to map the
@@ -2169,12 +2044,6 @@ type KubeVirtConfiguration struct {
 	SELinuxLauncherType    string                  `json:"selinuxLauncherType,omitempty"`
 	DefaultRuntimeClass    string                  `json:"defaultRuntimeClass,omitempty"`
 	SMBIOSConfig           *SMBiosConfiguration    `json:"smbios,omitempty"`
-
-	// EvictionStrategy defines at the cluster level if the VirtualMachineInstance should be
-	// migrated instead of shut-off in case of a node drain. If the VirtualMachineInstance specific
-	// field is set it overrides the cluster level one.
-	EvictionStrategy *EvictionStrategy `json:"evictionStrategy,omitempty"`
-
 	// deprecated
 	SupportedGuestAgentVersions    []string                          `json:"supportedGuestAgentVersions,omitempty"`
 	MemBalloonStatsPeriod          *uint32                           `json:"memBalloonStatsPeriod,omitempty"`
@@ -2246,12 +2115,7 @@ type LogVerbosity struct {
 	NodeVerbosity map[string]uint `json:"nodeVerbosity,omitempty"`
 }
 
-const (
-	PCIResourcePrefix  = "PCI_RESOURCE"
-	MDevResourcePrefix = "MDEV_PCI_RESOURCE"
-)
-
-// PermittedHostDevices holds information about devices allowed for passthrough
+// PermittedHostDevices holds inforamtion about devices allowed for passthrough
 type PermittedHostDevices struct {
 	// +listType=atomic
 	PciHostDevices []PciHostDevice `json:"pciHostDevices,omitempty"`
@@ -2281,7 +2145,7 @@ type MediatedHostDevice struct {
 	ExternalResourceProvider bool   `json:"externalResourceProvider,omitempty"`
 }
 
-// MediatedDevicesConfiguration holds information about MDEV types to be defined, if available
+// MediatedDevicesConfiguration holds inforamtion about MDEV types to be defined, if available
 type MediatedDevicesConfiguration struct {
 	// +listType=atomic
 	MediatedDevicesTypes []string `json:"mediatedDevicesTypes,omitempty"`
@@ -2290,7 +2154,7 @@ type MediatedDevicesConfiguration struct {
 	NodeMediatedDeviceTypes []NodeMediatedDeviceTypesConfig `json:"nodeMediatedDeviceTypes,omitempty"`
 }
 
-// NodeMediatedDeviceTypesConfig holds information about MDEV types to be defined in a specifc node that matches the NodeSelector field.
+// NodeMediatedDeviceTypesConfig holds inforamtion about MDEV types to be defined in a specifc node that matches the NodeSelector field.
 // +k8s:openapi-gen=true
 type NodeMediatedDeviceTypesConfig struct {
 	// NodeSelector is a selector which must be true for the vmi to fit on a node.
@@ -2327,42 +2191,19 @@ type ClusterProfilerRequest struct {
 	PageSize      int64  `json:"pageSize"`
 }
 
-// InstancetypeMatcher references a instancetype that is used to fill fields in the VMI template.
-type InstancetypeMatcher struct {
-	// Name is the name of the VirtualMachineInstancetype or VirtualMachineClusterInstancetype
+// FlavorMatcher references a flavor that is used to fill fields in the VMI template.
+type FlavorMatcher struct {
+	// Name is the name of the VirtualMachineFlavor or VirtualMachineClusterFlavor
 	Name string `json:"name"`
 
-	// Kind specifies which instancetype resource is referenced.
-	// Allowed values are: "VirtualMachineInstancetype" and "VirtualMachineClusterInstancetype".
-	// If not specified, "VirtualMachineClusterInstancetype" is used by default.
+	// Kind specifies which flavor resource is referenced.
+	// Allowed values are: "VirtualMachineFlavor" and "VirtualMachineClusterFlavor".
+	// If not specified, "VirtualMachineClusterFlavor" is used by default.
 	//
 	// +optional
 	Kind string `json:"kind,omitempty"`
 
-	// RevisionName specifies a ControllerRevision containing a specific copy of the
-	// VirtualMachineInstancetype or VirtualMachineClusterInstancetype to be used. This is initially
-	// captured the first time the instancetype is applied to the VirtualMachineInstance.
-	//
+	// Profile is the name of a custom profile in the flavor. If left empty, the default profile is used.
 	// +optional
-	RevisionName string `json:"revisionName,omitempty"`
-}
-
-// PreferenceMatcher references a set of preference that is used to fill fields in the VMI template.
-type PreferenceMatcher struct {
-	// Name is the name of the VirtualMachinePreference or VirtualMachineClusterPreference
-	Name string `json:"name"`
-
-	// Kind specifies which preference resource is referenced.
-	// Allowed values are: "VirtualMachinePreference" and "VirtualMachineClusterPreference".
-	// If not specified, "VirtualMachineClusterPreference" is used by default.
-	//
-	// +optional
-	Kind string `json:"kind,omitempty"`
-
-	// RevisionName specifies a ControllerRevision containing a specific copy of the
-	// VirtualMachinePreference or VirtualMachineClusterPreference to be used. This is
-	// initially captured the first time the instancetype is applied to the VirtualMachineInstance.
-	//
-	// +optional
-	RevisionName string `json:"revisionName,omitempty"`
+	Profile string `json:"profile,omitempty"`
 }
