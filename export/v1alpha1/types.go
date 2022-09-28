@@ -54,9 +54,8 @@ type VirtualMachineExportList struct {
 type VirtualMachineExportSpec struct {
 	Source corev1.TypedLocalObjectReference `json:"source"`
 
-	// +optional
-	// TokenSecretRef is the name of the custom-defined secret that contains the token used by the export server pod
-	TokenSecretRef *string `json:"tokenSecretRef,omitempty"`
+	// TokenSecretRef is the name of the secret that contains the token used by the export server pod
+	TokenSecretRef string `json:"tokenSecretRef"`
 }
 
 // VirtualMachineExportPhase is the current phase of the VirtualMachineExport
@@ -69,8 +68,6 @@ const (
 	Ready VirtualMachineExportPhase = "Ready"
 	// Terminated means the Virtual Machine export is terminated and no longer available
 	Terminated VirtualMachineExportPhase = "Terminated"
-	// Skipped means the export is invalid in a way so the exporter pod cannot start, and we are skipping creating the exporter server pod.
-	Skipped VirtualMachineExportPhase = "Skipped"
 )
 
 // VirtualMachineExportStatus is the status for a VirtualMachineExport resource
@@ -80,10 +77,6 @@ type VirtualMachineExportStatus struct {
 
 	// +optional
 	Links *VirtualMachineExportLinks `json:"links,omitempty"`
-
-	// +optional
-	// TokenSecretRef is the name of the secret that contains the token used by the export server pod
-	TokenSecretRef *string `json:"tokenSecretRef,omitempty"`
 
 	// +optional
 	// ServiceName is the name of the service created associated with the Virtual Machine export. It will be used to
@@ -154,8 +147,6 @@ const (
 	ConditionReady ConditionType = "Ready"
 	// ConditionPVC is the condition of the PVC we are exporting
 	ConditionPVC ConditionType = "PVCReady"
-	// ConditionVolumesCreated is the condition to see if volumes are created from volume snapshots
-	ConditionVolumesCreated ConditionType = "VolumesCreated"
 )
 
 // Condition defines conditions

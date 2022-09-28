@@ -100,15 +100,7 @@ type VirtualMachineInstanceSpec struct {
 	SchedulerName string `json:"schedulerName,omitempty"`
 	// If toleration is specified, obey all the toleration rules.
 	Tolerations []k8sv1.Toleration `json:"tolerations,omitempty"`
-	// TopologySpreadConstraints describes how a group of VMIs will be spread across a given topology
-	// domains. K8s scheduler will schedule VMI pods in a way which abides by the constraints.
-	// +optional
-	// +patchMergeKey=topologyKey
-	// +patchStrategy=merge
-	// +listType=map
-	// +listMapKey=topologyKey
-	// +listMapKey=whenUnsatisfiable
-	TopologySpreadConstraints []k8sv1.TopologySpreadConstraint `json:"topologySpreadConstraints,omitempty" patchStrategy:"merge" patchMergeKey:"topologyKey"`
+
 	// EvictionStrategy can be set to "LiveMigrate" if the VirtualMachineInstance should be
 	// migrated instead of shut-off in case of a node drain.
 	//
@@ -473,8 +465,6 @@ const (
 	VirtualMachineInstanceReasonHostDeviceNotMigratable = "HostDeviceNotLiveMigratable"
 	// Reason means that VMI is not live migratable because it uses Secure Encrypted Virtualization (SEV)
 	VirtualMachineInstanceReasonSEVNotMigratable = "SEVNotLiveMigratable"
-	// Reason means that VMI is not live migratable because it uses HyperV Reenlightenment while TSC Frequency is not available
-	VirtualMachineInstanceReasonNoTSCFrequencyMigratable = "NoTSCFrequencyNotLiveMigratable"
 )
 
 const (
@@ -562,8 +552,6 @@ type VirtualMachineInstanceNetworkInterface struct {
 	InterfaceName string `json:"interfaceName,omitempty"`
 	// Specifies the origin of the interface data collected. values: domain, guest-agent, or both
 	InfoSource string `json:"infoSource,omitempty"`
-	// Specifies how many queues are allocated by MultiQueue
-	QueueCount int32 `json:"queueCount,omitempty"`
 }
 
 type VirtualMachineInstanceGuestOSInfo struct {
@@ -862,16 +850,16 @@ const (
 	// SEVLabel marks the node as capable of running workloads with SEV
 	SEVLabel string = "kubevirt.io/sev"
 
-	// InstancetypeAnnotation is the name of a VirtualMachineInstancetype
-	InstancetypeAnnotation string = "kubevirt.io/instancetype-name"
+	// FlavorAnnotation is the name of a VirtualMachineFlavor
+	FlavorAnnotation string = "kubevirt.io/flavor-name"
 
-	// ClusterInstancetypeAnnotation is the name of a VirtualMachineClusterInstancetype
-	ClusterInstancetypeAnnotation string = "kubevirt.io/cluster-instancetype-name"
+	// ClusterFlavorAnnotation is the name of a VirtualMachineClusterFlavor
+	ClusterFlavorAnnotation string = "kubevirt.io/cluster-flavor-name"
 
-	// InstancetypeAnnotation is the name of a VirtualMachinePreference
+	// FlavorAnnotation is the name of a VirtualMachinePreference
 	PreferenceAnnotation string = "kubevirt.io/preference-name"
 
-	// ClusterInstancetypeAnnotation is the name of a VirtualMachinePreferenceInstancetype
+	// ClusterFlavorAnnotation is the name of a VirtualMachinePreferenceFlavor
 	ClusterPreferenceAnnotation string = "kubevirt.io/cluster-preference-name"
 
 	// VirtualMachinePoolRevisionName is used to store the vmpool revision's name this object
@@ -1187,8 +1175,6 @@ const (
 	MigrationFailed VirtualMachineInstanceMigrationPhase = "Failed"
 )
 
-// Deprecated for removal in v2, please use VirtualMachineInstanceType and VirtualMachinePreference instead.
-//
 // VirtualMachineInstancePreset defines a VMI spec.domain to be applied to all VMIs that match the provided label selector
 // More info: https://kubevirt.io/user-guide/virtual_machines/presets/#overrides
 //
@@ -1313,8 +1299,8 @@ type VirtualMachineSpec struct {
 	// mutually exclusive with Running
 	RunStrategy *VirtualMachineRunStrategy `json:"runStrategy,omitempty" optional:"true"`
 
-	// InstancetypeMatcher references a instancetype that is used to fill fields in Template
-	Instancetype *InstancetypeMatcher `json:"instancetype,omitempty" optional:"true"`
+	// FlavorMatcher references a flavor that is used to fill fields in Template
+	Flavor *FlavorMatcher `json:"flavor,omitempty" optional:"true"`
 
 	// PreferenceMatcher references a set of preference that is used to fill fields in Template
 	Preference *PreferenceMatcher `json:"preference,omitempty" optional:"true"`
@@ -1376,6 +1362,8 @@ const (
 	VirtualMachineStatusImagePullBackOff VirtualMachinePrintableStatus = "ImagePullBackOff"
 	// VirtualMachineStatusPvcNotFound indicates that the virtual machine references a PVC volume which doesn't exist.
 	VirtualMachineStatusPvcNotFound VirtualMachinePrintableStatus = "ErrorPvcNotFound"
+	// VirtualMachineStatusDataVolumeNotFound indicates that the virtual machine references a DataVolume volume which doesn't exist.
+	VirtualMachineStatusDataVolumeNotFound VirtualMachinePrintableStatus = "ErrorDataVolumeNotFound"
 	// VirtualMachineStatusDataVolumeError indicates that an error has been reported by one of the DataVolumes
 	// referenced by the virtual machines.
 	VirtualMachineStatusDataVolumeError VirtualMachinePrintableStatus = "DataVolumeError"
@@ -1506,8 +1494,6 @@ const (
 	SlirpInterface NetworkInterfaceType = "slirp"
 	// Virtual machine instance masquerade interface
 	MasqueradeInterface NetworkInterfaceType = "masquerade"
-	// Virtual machine instance passt interface
-	PasstInterface NetworkInterfaceType = "passt"
 )
 
 type DriverCache string
@@ -2063,20 +2049,13 @@ type VirtualMachineMemoryDumpRequest struct {
 	ClaimName string `json:"claimName"`
 	// Phase represents the memory dump phase
 	Phase MemoryDumpPhase `json:"phase"`
-	// Remove represents request of dissociating the memory dump pvc
-	// +optional
-	Remove bool `json:"remove,omitempty"`
 	// StartTimestamp represents the time the memory dump started
-	// +optional
 	StartTimestamp *metav1.Time `json:"startTimestamp,omitempty"`
 	// EndTimestamp represents the time the memory dump was completed
-	// +optional
 	EndTimestamp *metav1.Time `json:"endTimestamp,omitempty"`
 	// FileName represents the name of the output file
-	// +optional
 	FileName *string `json:"fileName,omitempty"`
 	// Message is a detailed message about failure of the memory dump
-	// +optional
 	Message string `json:"message,omitempty"`
 }
 
@@ -2115,10 +2094,6 @@ type AddVolumeOptions struct {
 	// +optional
 	// +listType=atomic
 	DryRun []string `json:"dryRun,omitempty"`
-}
-
-type ScreenshotOptions struct {
-	MoveCursor bool `json:"moveCursor"`
 }
 
 // RemoveVolumeOptions is provided when dynamically hot unplugging volume and disk
@@ -2195,7 +2170,6 @@ type KubeVirtConfiguration struct {
 	WebhookConfiguration           *ReloadableComponentConfiguration `json:"webhookConfiguration,omitempty"`
 	ControllerConfiguration        *ReloadableComponentConfiguration `json:"controllerConfiguration,omitempty"`
 	HandlerConfiguration           *ReloadableComponentConfiguration `json:"handlerConfiguration,omitempty"`
-	TLSConfiguration               *TLSConfiguration                 `json:"tlsConfiguration,omitempty"`
 }
 
 type SMBiosConfiguration struct {
@@ -2204,34 +2178,6 @@ type SMBiosConfiguration struct {
 	Version      string `json:"version,omitempty"`
 	Sku          string `json:"sku,omitempty"`
 	Family       string `json:"family,omitempty"`
-}
-
-type TLSProtocolVersion string
-
-const (
-	// VersionTLS10 is version 1.0 of the TLS security protocol.
-	VersionTLS10 TLSProtocolVersion = "VersionTLS10"
-	// VersionTLS11 is version 1.1 of the TLS security protocol.
-	VersionTLS11 TLSProtocolVersion = "VersionTLS11"
-	// VersionTLS12 is version 1.2 of the TLS security protocol.
-	VersionTLS12 TLSProtocolVersion = "VersionTLS12"
-	// VersionTLS13 is version 1.3 of the TLS security protocol.
-	VersionTLS13 TLSProtocolVersion = "VersionTLS13"
-)
-
-// TLSConfiguration holds TLS options
-type TLSConfiguration struct {
-	// MinTLSVersion is a way to specify the minimum protocol version that is acceptable for TLS connections.
-	// Protocol versions are based on the following most common TLS configurations:
-	//
-	//   https://ssl-config.mozilla.org/
-	//
-	// Note that SSLv3.0 is not a supported protocol version due to well known
-	// vulnerabilities such as POODLE: https://en.wikipedia.org/wiki/POODLE
-	// +kubebuilder:validation:Enum=VersionTLS10;VersionTLS11;VersionTLS12;VersionTLS13
-	MinTLSVersion TLSProtocolVersion `json:"minTLSVersion,omitempty"`
-	// +listType=set
-	Ciphers []string `json:"ciphers,omitempty"`
 }
 
 // MigrationConfiguration holds migration options
@@ -2364,21 +2310,21 @@ type ClusterProfilerRequest struct {
 	PageSize      int64  `json:"pageSize"`
 }
 
-// InstancetypeMatcher references a instancetype that is used to fill fields in the VMI template.
-type InstancetypeMatcher struct {
-	// Name is the name of the VirtualMachineInstancetype or VirtualMachineClusterInstancetype
+// FlavorMatcher references a flavor that is used to fill fields in the VMI template.
+type FlavorMatcher struct {
+	// Name is the name of the VirtualMachineFlavor or VirtualMachineClusterFlavor
 	Name string `json:"name"`
 
-	// Kind specifies which instancetype resource is referenced.
-	// Allowed values are: "VirtualMachineInstancetype" and "VirtualMachineClusterInstancetype".
-	// If not specified, "VirtualMachineClusterInstancetype" is used by default.
+	// Kind specifies which flavor resource is referenced.
+	// Allowed values are: "VirtualMachineFlavor" and "VirtualMachineClusterFlavor".
+	// If not specified, "VirtualMachineClusterFlavor" is used by default.
 	//
 	// +optional
 	Kind string `json:"kind,omitempty"`
 
 	// RevisionName specifies a ControllerRevision containing a specific copy of the
-	// VirtualMachineInstancetype or VirtualMachineClusterInstancetype to be used. This is initially
-	// captured the first time the instancetype is applied to the VirtualMachineInstance.
+	// VirtualMachineFlavor or VirtualMachineClusterFlavor to be used. This is initially
+	// captured the first time the flavor is applied to the VirtualMachineInstance.
 	//
 	// +optional
 	RevisionName string `json:"revisionName,omitempty"`
@@ -2398,7 +2344,7 @@ type PreferenceMatcher struct {
 
 	// RevisionName specifies a ControllerRevision containing a specific copy of the
 	// VirtualMachinePreference or VirtualMachineClusterPreference to be used. This is
-	// initially captured the first time the instancetype is applied to the VirtualMachineInstance.
+	// initially captured the first time the flavor is applied to the VirtualMachineInstance.
 	//
 	// +optional
 	RevisionName string `json:"revisionName,omitempty"`

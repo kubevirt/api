@@ -17,16 +17,16 @@
  *
  */
 
-package instancetype
+package flavor
 
 // GroupName is the group name used in this package
 const (
-	GroupName = "instancetype.kubevirt.io"
+	GroupName = "flavor.kubevirt.io"
 
-	SingularResourceName = "virtualmachineinstancetype"
+	SingularResourceName = "virtualmachineflavor"
 	PluralResourceName   = SingularResourceName + "s"
 
-	ClusterSingularResourceName = "virtualmachineclusterinstancetype"
+	ClusterSingularResourceName = "virtualmachineclusterflavor"
 	ClusterPluralResourceName   = ClusterSingularResourceName + "s"
 
 	SingularPreferenceResourceName = "virtualmachinepreference"

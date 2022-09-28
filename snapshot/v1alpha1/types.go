@@ -90,7 +90,6 @@ const (
 	InProgress VirtualMachineSnapshotPhase = "InProgress"
 	Succeeded  VirtualMachineSnapshotPhase = "Succeeded"
 	Failed     VirtualMachineSnapshotPhase = "Failed"
-	Deleting   VirtualMachineSnapshotPhase = "Deleting"
 	Unknown    VirtualMachineSnapshotPhase = "Unknown"
 )
 
