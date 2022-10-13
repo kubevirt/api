@@ -22,7 +22,6 @@ limitations under the License.
 package v1alpha1
 
 import (
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -167,11 +166,6 @@ func (in *VirtualMachineExportSpec) DeepCopyInto(out *VirtualMachineExportSpec) 
 		*out = new(string)
 		**out = **in
 	}
-	if in.TTLDuration != nil {
-		in, out := &in.TTLDuration, &out.TTLDuration
-		*out = new(v1.Duration)
-		**out = **in
-	}
 	return
 }
 
@@ -197,10 +191,6 @@ func (in *VirtualMachineExportStatus) DeepCopyInto(out *VirtualMachineExportStat
 		in, out := &in.TokenSecretRef, &out.TokenSecretRef
 		*out = new(string)
 		**out = **in
-	}
-	if in.TTLExpirationTime != nil {
-		in, out := &in.TTLExpirationTime, &out.TTLExpirationTime
-		*out = (*in).DeepCopy()
 	}
 	if in.Conditions != nil {
 		in, out := &in.Conditions, &out.Conditions
