@@ -75,6 +75,7 @@ type ConfigMapVolumeSource struct {
 type SecretVolumeSource struct {
 	// Name of the secret in the pod's namespace to use.
 	// More info: https://kubernetes.io/docs/concepts/storage/volumes#secret
+	// +optional
 	SecretName string `json:"secretName,omitempty"`
 	// Specify whether the Secret or it's keys must be defined
 	// +optional
@@ -430,9 +431,6 @@ type Devices struct {
 	// Defaults to false.
 	// +optional
 	AutoattachInputDevice *bool `json:"autoattachInputDevice,omitempty"`
-	// Whether to attach the VSOCK CID to the VM or not.
-	// VSOCK access will be available if set to true. Defaults to false.
-	AutoattachVSOCK *bool `json:"autoattachVSOCK,omitempty"`
 	// Whether to have random number generator from host
 	// +optional
 	Rng *Rng `json:"rng,omitempty"`
@@ -630,7 +628,7 @@ type DiskBus string
 const (
 	DiskBusSCSI   DiskBus = "scsi"
 	DiskBusSATA   DiskBus = "sata"
-	DiskBusVirtio DiskBus = VirtIO
+	DiskBusVirtio DiskBus = "virtio"
 	DiskBusUSB    DiskBus = "usb"
 )
 
@@ -776,8 +774,7 @@ type HotplugVolumeSource struct {
 }
 
 type DataVolumeSource struct {
-	// Name of both the DataVolume and the PVC in the same namespace.
-	// After PVC population the DataVolume is garbage collected by default.
+	// Name represents the name of the DataVolume in the same namespace
 	Name string `json:"name"`
 	// Hotpluggable indicates whether the volume can be hotplugged and hotunplugged.
 	// +optional
@@ -860,7 +857,7 @@ type Clock struct {
 	ClockOffset `json:",inline"`
 	// Timer specifies whih timers are attached to the vmi.
 	// +optional
-	Timer *Timer `json:"timer,omitempty"`
+	Timer *Timer `json:"timer"`
 }
 
 // Represents all available timers in a vmi.
@@ -1175,11 +1172,6 @@ type Interface struct {
 	// If specified, the virtual network interface address and its tag will be provided to the guest via config drive
 	// +optional
 	Tag string `json:"tag,omitempty"`
-	// If specified, the ACPI index is used to provide network interface device naming, that is stable across changes
-	// in PCI addresses assigned to the device.
-	// This value is required to be unique across all devices and be between 1 and (16*1024-1).
-	// +optional
-	ACPIIndex int `json:"acpiIndex,omitempty"`
 }
 
 // Extra DHCP options to use in the interface.
