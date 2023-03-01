@@ -901,10 +901,6 @@ const (
 	// PVCMemoryDumpAnnotation is the name of the memory dump representing the vm name,
 	// pvc name and the timestamp the memory dump was collected
 	PVCMemoryDumpAnnotation string = "kubevirt.io/memory-dump"
-
-	// AllowPodBridgeNetworkLiveMigrationAnnotation allow to run live migration when the
-	// vm has the pod networking bind with a bridge
-	AllowPodBridgeNetworkLiveMigrationAnnotation string = "kubevirt.io/allow-pod-bridge-network-live-migration"
 )
 
 func NewVMI(name string, uid types.UID) *VirtualMachineInstance {
@@ -1552,6 +1548,9 @@ const (
 	// IONative - Kernel native I/O tasks (AIO) offer a better performance but can block the VM if the file is not fully
 	// allocated so this method recommended only when the backing file/disk/etc is fully preallocated.
 	IONative DriverIO = "native"
+	// IODefault - Fallback to the default value from the kernel. With recent Kernel versions (for example RHEL-7) the
+	// default is AIO.
+	IODefault DriverIO = "default"
 )
 
 // Handler defines a specific action that should be taken
