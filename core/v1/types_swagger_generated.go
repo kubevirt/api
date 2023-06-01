@@ -38,7 +38,6 @@ func (VirtualMachineInstanceSpec) SwaggerDoc() map[string]string {
 		"dnsPolicy":                     "Set DNS policy for the pod.\nDefaults to \"ClusterFirst\".\nValid values are 'ClusterFirstWithHostNet', 'ClusterFirst', 'Default' or 'None'.\nDNS parameters given in DNSConfig will be merged with the policy selected with DNSPolicy.\nTo have DNS options set along with hostNetwork, you have to specify DNS policy\nexplicitly to 'ClusterFirstWithHostNet'.\n+optional",
 		"dnsConfig":                     "Specifies the DNS parameters of a pod.\nParameters specified here will be merged to the generated DNS\nconfiguration based on DNSPolicy.\n+optional",
 		"accessCredentials":             "Specifies a set of public keys to inject into the vm guest\n+listType=atomic\n+optional",
-		"architecture":                  "Specifies the architecture of the vm guest you are attempting to run. Defaults to the compiled architecture of the KubeVirt components",
 	}
 }
 
@@ -76,9 +75,7 @@ func (VirtualMachineInstanceStatus) SwaggerDoc() map[string]string {
 		"topologyHints":                 "+optional",
 		"virtualMachineRevisionName":    "VirtualMachineRevisionName is used to get the vm revision of the vmi when doing\nan online vm snapshot\n+optional",
 		"runtimeUser":                   "RuntimeUser is used to determine what user will be used in launcher\n+optional",
-		"VSOCKCID":                      "VSOCKCID is used to track the allocated VSOCK CID in the VM.\n+optional",
 		"selinuxContext":                "SELinuxContext is the actual SELinux context of the virt-launcher pod\n+optional",
-		"machine":                       "Machine shows the final resulting qemu machine type. This can be different\nthan the machine type selected in the spec, due to qemus machine type alias mechanism.\n+optional",
 	}
 }
 
@@ -148,7 +145,7 @@ func (VirtualMachineInstanceNetworkInterface) SwaggerDoc() map[string]string {
 		"name":          "Name of the interface, corresponds to name of the network assigned to the interface",
 		"ipAddresses":   "List of all IP addresses of a Virtual Machine interface",
 		"interfaceName": "The interface name inside the Virtual Machine",
-		"infoSource":    "Specifies the origin of the interface data collected. values: domain, guest-agent, multus-status.",
+		"infoSource":    "Specifies the origin of the interface data collected. values: domain, guest-agent, or both",
 		"queueCount":    "Specifies how many queues are allocated by MultiQueue",
 	}
 }
@@ -171,7 +168,6 @@ func (VirtualMachineInstanceMigrationState) SwaggerDoc() map[string]string {
 		"":                               "+k8s:openapi-gen=true",
 		"startTimestamp":                 "The time the migration action began\n+nullable",
 		"endTimestamp":                   "The time the migration action ended\n+nullable",
-		"targetNodeDomainReadyTimestamp": "The timestamp at which the target node detects the domain is active",
 		"targetNodeDomainDetected":       "The Target Node has seen the Domain Start Event",
 		"targetNodeAddress":              "The address of the target node to use for the migration",
 		"targetDirectMigrationNodePorts": "The list of ports opened for live migration on the destination node",
@@ -284,7 +280,6 @@ func (VirtualMachineInstanceMigrationStatus) SwaggerDoc() map[string]string {
 	return map[string]string{
 		"":                          "VirtualMachineInstanceMigration reprents information pertaining to a VMI's migration.",
 		"phaseTransitionTimestamps": "PhaseTransitionTimestamp is the timestamp of when the last phase change occurred\n+listType=atomic\n+optional",
-		"migrationState":            "Represents the status of a live migration",
 	}
 }
 
@@ -354,9 +349,6 @@ func (VirtualMachineStatus) SwaggerDoc() map[string]string {
 		"volumeSnapshotStatuses": "VolumeSnapshotStatuses indicates a list of statuses whether snapshotting is\nsupported by each volume.",
 		"startFailure":           "StartFailure tracks consecutive VMI startup failures for the purposes of\ncrash loop backoffs\n+nullable\n+optional",
 		"memoryDumpRequest":      "MemoryDumpRequest tracks memory dump request phase and info of getting a memory\ndump to the given pvc\n+nullable\n+optional",
-		"observedGeneration":     "ObservedGeneration is the generation observed by the vmi when started.\n+optional",
-		"desiredGeneration":      "DesiredGeneration is the generation which is desired for the VMI.\nThis will be used in comparisons with ObservedGeneration to understand when\nthe VMI is out of sync. This will be changed at the same time as\nObservedGeneration to remove errors which could occur if Generation is\nupdated through an Update() before ObservedGeneration in Status.\n+optional",
-		"interfaceRequests":      "InterfaceRequests indicates a list of interfaces added to the VMI template and\nhot-plugged on an active running VMI.\n+listType=atomic",
 	}
 }
 
@@ -380,13 +372,6 @@ func (VirtualMachineStateChangeRequest) SwaggerDoc() map[string]string {
 		"action": "Indicates the type of action that is requested. e.g. Start or Stop",
 		"data":   "Provides additional data in order to perform the Action",
 		"uid":    "Indicates the UUID of an existing Virtual Machine Instance that this change request applies to -- if applicable",
-	}
-}
-
-func (VirtualMachineInterfaceRequest) SwaggerDoc() map[string]string {
-	return map[string]string{
-		"addInterfaceOptions":    "AddInterfaceOptions when set indicates a network interface should be added.\nThe details within this field specify how to add the interface",
-		"removeInterfaceOptions": "RemoveInterfaceOptions when set indicates a network interface should be removed.\nThe details within this field specify how to remove the interface",
 	}
 }
 
@@ -467,7 +452,6 @@ func (KubeVirtSpec) SwaggerDoc() map[string]string {
 		"imageTag":                "The image tag to use for the continer images installed.\nDefaults to the same tag as the operator's container image.",
 		"imageRegistry":           "The image registry to pull the container images from\nDefaults to the same registry the operator's container image is pulled from.",
 		"imagePullPolicy":         "The ImagePullPolicy to use.",
-		"imagePullSecrets":        "The imagePullSecrets to pull the container images from\nDefaults to none\n+listType=atomic",
 		"monitorNamespace":        "The namespace Prometheus is deployed in\nDefaults to openshift-monitor",
 		"serviceMonitorNamespace": "The namespace the service monitor will be deployed\n When ServiceMonitorNamespace is set, then we'll install the service monitor object in that namespace\notherwise we will use the monitoring namespace.",
 		"monitorAccount":          "The name of the Prometheus service account that needs read-access to KubeVirt endpoints\nDefaults to prometheus-k8s",
@@ -657,30 +641,11 @@ func (ScreenshotOptions) SwaggerDoc() map[string]string {
 	return map[string]string{}
 }
 
-func (VSOCKOptions) SwaggerDoc() map[string]string {
-	return map[string]string{}
-}
-
 func (RemoveVolumeOptions) SwaggerDoc() map[string]string {
 	return map[string]string{
 		"":       "RemoveVolumeOptions is provided when dynamically hot unplugging volume and disk",
 		"name":   "Name represents the name that maps to both the disk and volume that\nshould be removed",
 		"dryRun": "When present, indicates that modifications should not be\npersisted. An invalid or unrecognized dryRun directive will\nresult in an error response and no further processing of the\nrequest. Valid values are:\n- All: all dry run stages will be processed\n+optional\n+listType=atomic",
-	}
-}
-
-func (AddInterfaceOptions) SwaggerDoc() map[string]string {
-	return map[string]string{
-		"":                                "AddInterfaceOptions is provided when dynamically hot plugging a network interface",
-		"networkAttachmentDefinitionName": "NetworkAttachmentDefinitionName references a NetworkAttachmentDefinition CRD object. Format:\n<networkAttachmentDefinitionName>, <namespace>/<networkAttachmentDefinitionName>. If namespace is not\nspecified, VMI namespace is assumed.",
-		"name":                            "Name indicates the logical name of the interface.",
-	}
-}
-
-func (RemoveInterfaceOptions) SwaggerDoc() map[string]string {
-	return map[string]string{
-		"":     "RemoveInterfaceOptions is provided when dynamically hot unplugging a network interface",
-		"name": "Name indicates the logical name of the interface.",
 	}
 }
 
@@ -714,58 +679,11 @@ func (KubeVirtConfiguration) SwaggerDoc() map[string]string {
 		"":                                   "KubeVirtConfiguration holds all kubevirt configurations",
 		"evictionStrategy":                   "EvictionStrategy defines at the cluster level if the VirtualMachineInstance should be\nmigrated instead of shut-off in case of a node drain. If the VirtualMachineInstance specific\nfield is set it overrides the cluster level one.",
 		"additionalGuestMemoryOverheadRatio": "AdditionalGuestMemoryOverheadRatio can be used to increase the virtualization infrastructure\noverhead. This is useful, since the calculation of this overhead is not accurate and cannot\nbe entirely known in advance. The ratio that is being set determines by which factor to increase\nthe overhead calculated by Kubevirt. A higher ratio means that the VMs would be less compromised\nby node pressures, but would mean that fewer VMs could be scheduled to a node.\nIf not set, the default is 1.",
-		"supportContainerResources":          "+listType=map\n+listMapKey=type\nSupportContainerResources specifies the resource requirements for various types of supporting containers such as container disks/virtiofs/sidecars and hotplug attachment pods. If omitted a sensible default will be supplied.",
 		"supportedGuestAgentVersions":        "deprecated",
-		"vmStateStorageClass":                "VMStateStorageClass is the name of the storage class to use for the PVCs created to preserve VM state, like TPM.\nThe storage class must support RWX in filesystem mode.",
-		"ksmConfiguration":                   "KSMConfiguration holds the information regarding the enabling the KSM in the nodes (if available).",
-	}
-}
-
-func (ArchConfiguration) SwaggerDoc() map[string]string {
-	return map[string]string{}
-}
-
-func (ArchSpecificConfiguration) SwaggerDoc() map[string]string {
-	return map[string]string{
-		"emulatedMachines": "+listType=atomic",
 	}
 }
 
 func (SMBiosConfiguration) SwaggerDoc() map[string]string {
-	return map[string]string{}
-}
-
-func (SupportContainerResources) SwaggerDoc() map[string]string {
-	return map[string]string{
-		"": "SupportContainerResources are used to specify the cpu/memory request and limits for the containers that support various features of Virtual Machines. These containers are usually idle and don't require a lot of memory or cpu.",
-	}
-}
-
-func (CustomProfile) SwaggerDoc() map[string]string {
-	return map[string]string{}
-}
-
-func (VirtualMachineInstanceProfile) SwaggerDoc() map[string]string {
-	return map[string]string{
-		"customProfile": "CustomProfile allows to request arbitrary profile for virt-launcher",
-	}
-}
-
-func (SeccompConfiguration) SwaggerDoc() map[string]string {
-	return map[string]string{
-		"":                              "SeccompConfiguration holds Seccomp configuration for Kubevirt components",
-		"virtualMachineInstanceProfile": "VirtualMachineInstanceProfile defines what profile should be used with virt-launcher. Defaults to none",
-	}
-}
-
-func (VirtualMachineOptions) SwaggerDoc() map[string]string {
-	return map[string]string{
-		"":                         "VirtualMachineOptions holds the cluster level information regarding the virtual machine.",
-		"disableFreePageReporting": "DisableFreePageReporting disable the free page reporting of\nmemory balloon device https://libvirt.org/formatdomain.html#memory-balloon-device.\nThis will have effect only if AutoattachMemBalloon is not false and the vmi is not\nrequesting any high performance feature (dedicatedCPU/realtime/hugePages), in which free page reporting is always disabled.",
-	}
-}
-
-func (DisableFreePageReporting) SwaggerDoc() map[string]string {
 	return map[string]string{}
 }
 
@@ -862,13 +780,6 @@ func (NodeMediatedDeviceTypesConfig) SwaggerDoc() map[string]string {
 	}
 }
 
-func (KSMConfiguration) SwaggerDoc() map[string]string {
-	return map[string]string{
-		"":                  "KSMConfiguration holds information about KSM.\n+k8s:openapi-gen=true",
-		"nodeLabelSelector": "NodeLabelSelector is a selector that filters in which nodes the KSM will be enabled.\nEmpty NodeLabelSelector will enable ksm for every node.\n+optional",
-	}
-}
-
 func (NetworkConfiguration) SwaggerDoc() map[string]string {
 	return map[string]string{
 		"": "NetworkConfiguration holds network options",
@@ -895,20 +806,18 @@ func (ClusterProfilerRequest) SwaggerDoc() map[string]string {
 
 func (InstancetypeMatcher) SwaggerDoc() map[string]string {
 	return map[string]string{
-		"":                "InstancetypeMatcher references a instancetype that is used to fill fields in the VMI template.",
-		"name":            "Name is the name of the VirtualMachineInstancetype or VirtualMachineClusterInstancetype\n\n+optional",
-		"kind":            "Kind specifies which instancetype resource is referenced.\nAllowed values are: \"VirtualMachineInstancetype\" and \"VirtualMachineClusterInstancetype\".\nIf not specified, \"VirtualMachineClusterInstancetype\" is used by default.\n\n+optional",
-		"revisionName":    "RevisionName specifies a ControllerRevision containing a specific copy of the\nVirtualMachineInstancetype or VirtualMachineClusterInstancetype to be used. This is initially\ncaptured the first time the instancetype is applied to the VirtualMachineInstance.\n\n+optional",
-		"inferFromVolume": "InferFromVolume lists the name of a volume that should be used to infer or discover the instancetype\nto be used through known annotations on the underlying resource. Once applied to the InstancetypeMatcher\nthis field is removed.\n\n+optional",
+		"":             "InstancetypeMatcher references a instancetype that is used to fill fields in the VMI template.",
+		"name":         "Name is the name of the VirtualMachineInstancetype or VirtualMachineClusterInstancetype",
+		"kind":         "Kind specifies which instancetype resource is referenced.\nAllowed values are: \"VirtualMachineInstancetype\" and \"VirtualMachineClusterInstancetype\".\nIf not specified, \"VirtualMachineClusterInstancetype\" is used by default.\n\n+optional",
+		"revisionName": "RevisionName specifies a ControllerRevision containing a specific copy of the\nVirtualMachineInstancetype or VirtualMachineClusterInstancetype to be used. This is initially\ncaptured the first time the instancetype is applied to the VirtualMachineInstance.\n\n+optional",
 	}
 }
 
 func (PreferenceMatcher) SwaggerDoc() map[string]string {
 	return map[string]string{
-		"":                "PreferenceMatcher references a set of preference that is used to fill fields in the VMI template.",
-		"name":            "Name is the name of the VirtualMachinePreference or VirtualMachineClusterPreference\n\n+optional",
-		"kind":            "Kind specifies which preference resource is referenced.\nAllowed values are: \"VirtualMachinePreference\" and \"VirtualMachineClusterPreference\".\nIf not specified, \"VirtualMachineClusterPreference\" is used by default.\n\n+optional",
-		"revisionName":    "RevisionName specifies a ControllerRevision containing a specific copy of the\nVirtualMachinePreference or VirtualMachineClusterPreference to be used. This is\ninitially captured the first time the instancetype is applied to the VirtualMachineInstance.\n\n+optional",
-		"inferFromVolume": "InferFromVolume lists the name of a volume that should be used to infer or discover the preference\nto be used through known annotations on the underlying resource. Once applied to the PreferenceMatcher\nthis field is removed.\n\n+optional",
+		"":             "PreferenceMatcher references a set of preference that is used to fill fields in the VMI template.",
+		"name":         "Name is the name of the VirtualMachinePreference or VirtualMachineClusterPreference",
+		"kind":         "Kind specifies which preference resource is referenced.\nAllowed values are: \"VirtualMachinePreference\" and \"VirtualMachineClusterPreference\".\nIf not specified, \"VirtualMachineClusterPreference\" is used by default.\n\n+optional",
+		"revisionName": "RevisionName specifies a ControllerRevision containing a specific copy of the\nVirtualMachinePreference or VirtualMachineClusterPreference to be used. This is\ninitially captured the first time the instancetype is applied to the VirtualMachineInstance.\n\n+optional",
 	}
 }

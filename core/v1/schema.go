@@ -75,6 +75,7 @@ type ConfigMapVolumeSource struct {
 type SecretVolumeSource struct {
 	// Name of the secret in the pod's namespace to use.
 	// More info: https://kubernetes.io/docs/concepts/storage/volumes#secret
+	// +optional
 	SecretName string `json:"secretName,omitempty"`
 	// Specify whether the Secret or it's keys must be defined
 	// +optional
@@ -430,9 +431,6 @@ type Devices struct {
 	// Defaults to false.
 	// +optional
 	AutoattachInputDevice *bool `json:"autoattachInputDevice,omitempty"`
-	// Whether to attach the VSOCK CID to the VM or not.
-	// VSOCK access will be available if set to true. Defaults to false.
-	AutoattachVSOCK *bool `json:"autoattachVSOCK,omitempty"`
 	// Whether to have random number generator from host
 	// +optional
 	Rng *Rng `json:"rng,omitempty"`
@@ -492,11 +490,7 @@ type SoundDevice struct {
 	Model string `json:"model,omitempty"`
 }
 
-type TPMDevice struct {
-	// Persistent indicates the state of the TPM device should be kept accross reboots
-	// Defaults to false
-	Persistent *bool `json:"persistent,omitempty"`
-}
+type TPMDevice struct{}
 
 type InputBus string
 
@@ -634,7 +628,7 @@ type DiskBus string
 const (
 	DiskBusSCSI   DiskBus = "scsi"
 	DiskBusSATA   DiskBus = "sata"
-	DiskBusVirtio DiskBus = VirtIO
+	DiskBusVirtio DiskBus = "virtio"
 	DiskBusUSB    DiskBus = "usb"
 )
 
@@ -665,8 +659,6 @@ type LunTarget struct {
 	// ReadOnly.
 	// Defaults to false.
 	ReadOnly bool `json:"readonly,omitempty"`
-	// Reservation indicates if the disk needs to support the persistent reservation for the SCSI disk
-	Reservation bool `json:"reservation,omitempty"`
 }
 
 // TrayState indicates if a tray of a cdrom is open or closed.
@@ -866,7 +858,7 @@ type Clock struct {
 	ClockOffset `json:",inline"`
 	// Timer specifies whih timers are attached to the vmi.
 	// +optional
-	Timer *Timer `json:"timer,omitempty"`
+	Timer *Timer `json:"timer"`
 }
 
 // Represents all available timers in a vmi.
@@ -1181,22 +1173,7 @@ type Interface struct {
 	// If specified, the virtual network interface address and its tag will be provided to the guest via config drive
 	// +optional
 	Tag string `json:"tag,omitempty"`
-	// If specified, the ACPI index is used to provide network interface device naming, that is stable across changes
-	// in PCI addresses assigned to the device.
-	// This value is required to be unique across all devices and be between 1 and (16*1024-1).
-	// +optional
-	ACPIIndex int `json:"acpiIndex,omitempty"`
-	// State represents the requested operational state of the interface.
-	// The (only) value supported is `absent`, expressing a request to remove the interface.
-	// +optional
-	State InterfaceState `json:"state,omitempty"`
 }
-
-type InterfaceState string
-
-const (
-	InterfaceStateAbsent InterfaceState = "absent"
-)
 
 // Extra DHCP options to use in the interface.
 type DHCPOptions struct {
