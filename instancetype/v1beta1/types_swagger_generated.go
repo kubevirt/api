@@ -54,9 +54,10 @@ func (CPUInstancetype) SwaggerDoc() map[string]string {
 
 func (MemoryInstancetype) SwaggerDoc() map[string]string {
 	return map[string]string{
-		"":          "MemoryInstancetype contains the Memory related configuration of a given VirtualMachineInstancetypeSpec.\n\nGuest is a required attribute and defines the amount of RAM to be exposed to the guest by the instancetype.",
-		"guest":     "Required amount of memory which is visible inside the guest OS.",
-		"hugepages": "Optionally enables the use of hugepages for the VirtualMachineInstance instead of regular memory.\n+optional",
+		"":                  "MemoryInstancetype contains the Memory related configuration of a given VirtualMachineInstancetypeSpec.\n\nGuest is a required attribute and defines the amount of RAM to be exposed to the guest by the instancetype.",
+		"guest":             "Required amount of memory which is visible inside the guest OS.",
+		"hugepages":         "Optionally enables the use of hugepages for the VirtualMachineInstance instead of regular memory.\n+optional",
+		"overcommitPercent": "OvercommitPercent is the percentage of the guest memory which will be overcommitted.\nThis means that the VMIs parent pod (virt-launcher) will request less\nphysical memory by a factor specified by the OvercommitPercent.\nOvercommits can lead to memory exhaustion, which in turn can lead to crashes. Use carefully.\nDefaults to 0\n+optional\n+kubebuilder:validation:Maximum=100\n+kubebuilder:validation:Minimum=0",
 	}
 }
 
@@ -100,6 +101,7 @@ func (VirtualMachinePreferenceSpec) SwaggerDoc() map[string]string {
 		"volumes":                                "Volumes optionally defines preferences associated with the Volumes attribute of a VirtualMachineInstace DomainSpec\n\n+optional",
 		"preferredSubdomain":                     "Subdomain of the VirtualMachineInstance\n\n+optional",
 		"preferredTerminationGracePeriodSeconds": "Grace period observed after signalling a VirtualMachineInstance to stop after which the VirtualMachineInstance is force terminated.\n\n+optional",
+		"requirements":                           "Requirements defines the minium amount of instance type defined resources required by a set of preferences\n\n+optional",
 	}
 }
 
@@ -181,5 +183,24 @@ func (ClockPreferences) SwaggerDoc() map[string]string {
 		"":                     "ClockPreferences contains various optional defaults for Clock.",
 		"preferredClockOffset": "ClockOffset allows specifying the UTC offset or the timezone of the guest clock.\n\n+optional",
 		"preferredTimer":       "Timer specifies whih timers are attached to the vmi.\n\n+optional",
+	}
+}
+
+func (PreferenceRequirements) SwaggerDoc() map[string]string {
+	return map[string]string{
+		"cpu":    "Required CPU related attributes of the instancetype.\n\n+optional",
+		"memory": "Required Memory related attributes of the instancetype.\n\n+optional",
+	}
+}
+
+func (CPUPreferenceRequirement) SwaggerDoc() map[string]string {
+	return map[string]string{
+		"guest": "Minimal number of vCPUs required by the preference.",
+	}
+}
+
+func (MemoryPreferenceRequirement) SwaggerDoc() map[string]string {
+	return map[string]string{
+		"guest": "Minimal amount of memory required by the preference.",
 	}
 }
