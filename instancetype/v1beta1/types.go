@@ -284,11 +284,6 @@ type VirtualMachinePreferenceSpec struct {
 	//
 	//+optional
 	Annotations map[string]string `json:"annotations,omitempty"`
-
-	// PreferSpreadSocketToCoreRatio defines the ratio to spread vCPUs between cores and sockets, it defaults to 2.
-	//
-	//+optional
-	PreferSpreadSocketToCoreRatio uint32 `json:"preferSpreadSocketToCoreRatio,omitempty"`
 }
 
 type VolumePreferences struct {
@@ -312,9 +307,6 @@ const (
 
 	// Prefer vCPUs to be exposed as threads to the guest
 	PreferThreads PreferredCPUTopology = "preferThreads"
-
-	// Prefer vCPUs to be spread evenly between cores and sockets with any remaining vCPUs being presented as cores
-	PreferSpread PreferredCPUTopology = "preferSpread"
 )
 
 // CPUPreferences contains various optional CPU preferences.
