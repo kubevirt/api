@@ -109,12 +109,9 @@ type VirtualMachineInstanceSpec struct {
 	// +listMapKey=topologyKey
 	// +listMapKey=whenUnsatisfiable
 	TopologySpreadConstraints []k8sv1.TopologySpreadConstraint `json:"topologySpreadConstraints,omitempty" patchStrategy:"merge" patchMergeKey:"topologyKey"`
-	// EvictionStrategy describes the strategy to follow when a node drain occurs.
-	// The possible options are:
-	// - "None": No action will be taken, according to the specified 'RunStrategy' the VirtualMachine will be restarted or shutdown.
-	// - "LiveMigrate": the VirtualMachineInstance will be migrated instead of being shutdown.
-	// - "LiveMigrateIfPossible": the same as "LiveMigrate" but only if the VirtualMachine is Live-Migratable, otherwise it will behave as "None".
-	// - "External": the VirtualMachineInstance will be protected by a PDB and `vmi.Status.EvacuationNodeName` will be set on eviction. This is mainly useful for cluster-api-provider-kubevirt (capk) which needs a way for VMI's to be blocked from eviction, yet signal capk that eviction has been called on the VMI so the capk controller can handle tearing the VMI down. Details can be found in the commit description https://github.com/kubevirt/kubevirt/commit/c1d77face705c8b126696bac9a3ee3825f27f1fa.
+	// EvictionStrategy can be set to "LiveMigrate" if the VirtualMachineInstance should be
+	// migrated instead of shut-off in case of a node drain.
+	//
 	// +optional
 	EvictionStrategy *EvictionStrategy `json:"evictionStrategy,omitempty"`
 	// StartStrategy can be set to "Paused" if Virtual Machine should be started in paused state.
@@ -1029,9 +1026,6 @@ const (
 	// AutoMemoryLimitsRatioLabel allows to use a custom ratio for auto memory limits calculation.
 	// Must be a float >= 1.
 	AutoMemoryLimitsRatioLabel string = "alpha.kubevirt.io/auto-memory-limits-ratio"
-
-	// MigrationInterfaceName is an arbitrary name used in virt-handler to connect it to a dedicated migration network
-	MigrationInterfaceName string = "migration0"
 
 	// EmulatorThreadCompleteToEvenParity alpha annotation will cause Kubevirt to complete the VMI's CPU count to an even parity when IsolateEmulatorThread options are requested
 	EmulatorThreadCompleteToEvenParity string = "alpha.kubevirt.io/EmulatorThreadCompleteToEvenParity"

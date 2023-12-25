@@ -233,13 +233,6 @@ func (Firmware) SwaggerDoc() map[string]string {
 		"bootloader": "Settings to control the bootloader that is used.\n+optional",
 		"serial":     "The system-serial-number in SMBIOS",
 		"kernelBoot": "Settings to set the kernel for booting.\n+optional",
-		"acpi":       "Information that can be set in the ACPI table",
-	}
-}
-
-func (ACPI) SwaggerDoc() map[string]string {
-	return map[string]string{
-		"slicNameRef": "SlicNameRef should match the volume name of a secret object. The data in the secret should\nbe a binary blob that follows the ACPI SLIC standard, see:\nhttps://learn.microsoft.com/en-us/previous-versions/windows/hardware/design/dn653305(v=vs.85)",
 	}
 }
 
@@ -694,8 +687,7 @@ func (DHCPPrivateOptions) SwaggerDoc() map[string]string {
 
 func (InterfaceBindingMethod) SwaggerDoc() map[string]string {
 	return map[string]string{
-		"":      "Represents the method which will be used to connect the interface to the guest.\nOnly one of its members may be specified.",
-		"passt": "Deprecated, please refer to Kubevirt user guide for alternatives.\n+optional",
+		"": "Represents the method which will be used to connect the interface to the guest.\nOnly one of its members may be specified.",
 	}
 }
 
