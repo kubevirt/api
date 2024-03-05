@@ -124,7 +124,6 @@ type VirtualMachineInstanceSpec struct {
 	// Grace period observed after signalling a VirtualMachineInstance to stop after which the VirtualMachineInstance is force terminated.
 	TerminationGracePeriodSeconds *int64 `json:"terminationGracePeriodSeconds,omitempty"`
 	// List of volumes that can be mounted by disks belonging to the vmi.
-	// +kubebuilder:validation:MaxItems:=256
 	Volumes []Volume `json:"volumes,omitempty"`
 	// Periodic probe of VirtualMachineInstance liveness.
 	// VirtualmachineInstances will be stopped if the probe fails.
@@ -148,7 +147,6 @@ type VirtualMachineInstanceSpec struct {
 	// +optional
 	Subdomain string `json:"subdomain,omitempty"`
 	// List of networks that can be attached to a vm's virtual interface.
-	// +kubebuilder:validation:MaxItems:=256
 	Networks []Network `json:"networks,omitempty"`
 	// Set DNS policy for the pod.
 	// Defaults to "ClusterFirst".
@@ -166,7 +164,6 @@ type VirtualMachineInstanceSpec struct {
 	// Specifies a set of public keys to inject into the vm guest
 	// +listType=atomic
 	// +optional
-	// +kubebuilder:validation:MaxItems:=256
 	AccessCredentials []AccessCredential `json:"accessCredentials,omitempty"`
 	// Specifies the architecture of the vm guest you are attempting to run. Defaults to the compiled architecture of the KubeVirt components
 	Architecture string `json:"architecture,omitempty"`
@@ -708,11 +705,8 @@ type VirtualMachineInstanceMigrationState struct {
 	TargetPod string `json:"targetPod,omitempty"`
 	// The UID of the target attachment pod for hotplug volumes
 	TargetAttachmentPodUID types.UID `json:"targetAttachmentPodUID,omitempty"`
-
 	// The source node that the VMI originated on
 	SourceNode string `json:"sourceNode,omitempty"`
-	SourcePod  string `json:"sourcePod,omitempty"`
-
 	// Indicates the migration completed
 	Completed bool `json:"completed,omitempty"`
 	// Indicates that the migration failed
@@ -721,8 +715,6 @@ type VirtualMachineInstanceMigrationState struct {
 	AbortRequested bool `json:"abortRequested,omitempty"`
 	// Indicates the final status of the live migration abortion
 	AbortStatus MigrationAbortStatus `json:"abortStatus,omitempty"`
-	// Contains the reason why the migration failed
-	FailureReason string `json:"failureReason,omitempty"`
 	// The VirtualMachineInstanceMigration object associated with this migration
 	MigrationUID types.UID `json:"migrationUid,omitempty"`
 	// Lets us know if the vmi is currently running pre or post copy migration
@@ -974,7 +966,7 @@ const (
 	// SEVESLabel marks the node as capable of running workloads with SEV-ES
 	SEVESLabel string = "kubevirt.io/sev-es"
 
-	// KSMEnabledLabel marks the node as KSM-handling enabled
+	// KSMEnabledLabel marks the node as KSM enabled
 	KSMEnabledLabel string = "kubevirt.io/ksm-enabled"
 
 	// KSMHandlerManagedAnnotation is an annotation used to mark the nodes where the virt-handler has enabled the ksm
