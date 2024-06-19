@@ -454,7 +454,7 @@ type DevicePreferences struct {
 	// +optional
 	PreferredCdromBus v1.DiskBus `json:"preferredCdromBus,omitempty"`
 
-	// PreferredDedicatedIoThread optionally enables dedicated IO threads for Disk devices using the virtio bus.
+	// PreferredDedicatedIoThread optionally enables dedicated IO threads for Disk devices.
 	//
 	// +optional
 	PreferredDiskDedicatedIoThread *bool `json:"preferredDiskDedicatedIoThread,omitempty"`
