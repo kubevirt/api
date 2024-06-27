@@ -22,7 +22,7 @@ go install k8s.io/code-generator/cmd/client-gen@latest
 The following command creates the client inside an example project called `testapi`:
 
 ```bash
-client-gen --input-base="kubevirt.io/api/" --input="core/v1" --output-package="testapi/client" --output-base="../" --clientset-name="versioned" --go-header-file boilerplate.go.txt
+client-gen --input-base="kubevirt.io/api/" --input="core/v1" --output-pkg="testapi/client" --output-dir="../" --clientset-name="versioned" --go-header-file boilerplate.go.txt
 ```
 
 `client-gen` always needs a `boilerplate.go.txt` file. If you don't want to
