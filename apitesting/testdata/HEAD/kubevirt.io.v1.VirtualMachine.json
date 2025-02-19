@@ -1283,24 +1283,6 @@
           }
         ]
       }
-    },
-    "instancetypeRef": {
-      "name": "nameValue",
-      "kind": "kindValue",
-      "controllerRevisionRef": {
-        "name": "nameValue"
-      },
-      "inferFromVolume": "inferFromVolumeValue",
-      "inferFromVolumeFailurePolicy": "inferFromVolumeFailurePolicyValue"
-    },
-    "preferenceRef": {
-      "name": "nameValue",
-      "kind": "kindValue",
-      "controllerRevisionRef": {
-        "name": "nameValue"
-      },
-      "inferFromVolume": "inferFromVolumeValue",
-      "inferFromVolumeFailurePolicy": "inferFromVolumeFailurePolicyValue"
     }
   }
 }

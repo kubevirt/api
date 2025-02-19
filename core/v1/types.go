@@ -989,8 +989,6 @@ const (
 	HypervLabel = "hyperv.node.kubevirt.io/"
 	// This label represents vendor of cpu model on the node
 	CPUModelVendorLabel = "cpu-vendor.node.kubevirt.io/"
-	// This label represents supported machine type on the node
-	SupportedMachineTypeLabel = "machine-type.node.kubevirt.io/"
 
 	VirtIO = "virtio"
 
@@ -1707,43 +1705,6 @@ type VirtualMachineStatus struct {
 	// VolumeUpdateState contains the information about the volumes set
 	// updates related to the volumeUpdateStrategy
 	VolumeUpdateState *VolumeUpdateState `json:"volumeUpdateState,omitempty" optional:"true"`
-
-	// InstancetypeRef captures the state of any referenced instance type from the VirtualMachine
-	//+nullable
-	//+optional
-	InstancetypeRef *InstancetypeStatusRef `json:"instancetypeRef,omitempty"`
-
-	// PreferenceRef captures the state of any referenced preference from the VirtualMachine
-	//+nullable
-	//+optional
-	PreferenceRef *InstancetypeStatusRef `json:"preferenceRef,omitempty"`
-}
-
-type ControllerRevisionRef struct {
-	// Name of the ControllerRevision
-	Name string `json:"name,omitempty"`
-}
-
-type InstancetypeStatusRef struct {
-	// Name is the name of resource
-	Name string `json:"name,omitempty"`
-
-	// Kind specifies the kind of resource
-	Kind string `json:"kind,omitempty"`
-
-	// ControllerRef specifies the ControllerRevision storing a copy of the object captured
-	// when it is first seen by the VirtualMachine controller
-	ControllerRevisionRef *ControllerRevisionRef `json:"controllerRevisionRef,omitempty"`
-
-	// InferFromVolume lists the name of a volume that should be used to infer or discover the resource
-	//
-	// +optional
-	InferFromVolume string `json:"inferFromVolume,omitempty"`
-
-	// InferFromVolumeFailurePolicy controls what should happen on failure when inferring the resource
-	//
-	// +optional
-	InferFromVolumeFailurePolicy *InferFromVolumeFailurePolicy `json:"inferFromVolumeFailurePolicy,omitempty"`
 }
 
 type VolumeUpdateState struct {
@@ -2561,6 +2522,7 @@ type KubeVirtConfiguration struct {
 	SeccompConfiguration           *SeccompConfiguration             `json:"seccompConfiguration,omitempty"`
 
 	// VMStateStorageClass is the name of the storage class to use for the PVCs created to preserve VM state, like TPM.
+	// The storage class must support RWX in filesystem mode.
 	VMStateStorageClass   string                 `json:"vmStateStorageClass,omitempty"`
 	VirtualMachineOptions *VirtualMachineOptions `json:"virtualMachineOptions,omitempty"`
 
@@ -2827,9 +2789,6 @@ type DeveloperConfiguration struct {
 	MinimumClusterTSCFrequency *int64            `json:"minimumClusterTSCFrequency,omitempty"`
 	DiskVerification           *DiskVerification `json:"diskVerification,omitempty"`
 	LogVerbosity               *LogVerbosity     `json:"logVerbosity,omitempty"`
-
-	// Enable the ability to pprof profile KubeVirt control plane
-	ClusterProfiler bool `json:"clusterProfiler,omitempty"`
 }
 
 // LogVerbosity sets log verbosity level of  various components
@@ -3043,10 +3002,7 @@ type ClusterProfilerRequest struct {
 
 type Matcher interface {
 	GetName() string
-	GetKind() string
 	GetRevisionName() string
-	GetInferFromVolume() string
-	GetInferFromVolumeFailurePolicy() *InferFromVolumeFailurePolicy
 }
 
 type InferFromVolumeFailurePolicy string
@@ -3096,20 +3052,8 @@ func (i InstancetypeMatcher) GetName() string {
 	return i.Name
 }
 
-func (i InstancetypeMatcher) GetKind() string {
-	return i.Kind
-}
-
 func (i InstancetypeMatcher) GetRevisionName() string {
 	return i.RevisionName
-}
-
-func (i InstancetypeMatcher) GetInferFromVolume() string {
-	return i.InferFromVolume
-}
-
-func (i InstancetypeMatcher) GetInferFromVolumeFailurePolicy() *InferFromVolumeFailurePolicy {
-	return i.InferFromVolumeFailurePolicy
 }
 
 // PreferenceMatcher references a set of preference that is used to fill fields in the VMI template.
@@ -3152,20 +3096,8 @@ func (p PreferenceMatcher) GetName() string {
 	return p.Name
 }
 
-func (p PreferenceMatcher) GetKind() string {
-	return p.Kind
-}
-
 func (p PreferenceMatcher) GetRevisionName() string {
 	return p.RevisionName
-}
-
-func (p PreferenceMatcher) GetInferFromVolume() string {
-	return p.InferFromVolume
-}
-
-func (p PreferenceMatcher) GetInferFromVolumeFailurePolicy() *InferFromVolumeFailurePolicy {
-	return p.InferFromVolumeFailurePolicy
 }
 
 type LiveUpdateConfiguration struct {
