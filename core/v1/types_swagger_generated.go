@@ -317,8 +317,7 @@ func (VirtualMachineInstanceMigrationList) SwaggerDoc() map[string]string {
 
 func (VirtualMachineInstanceMigrationSpec) SwaggerDoc() map[string]string {
 	return map[string]string{
-		"vmiName":           "The name of the VMI to perform the migration on. VMI must exist in the migration objects namespace",
-		"addedNodeSelector": "AddedNodeSelector is an additional selector that can be used to\ncomplement a NodeSelector or NodeAffinity as set on the VM\nto restrict the set of allowed target nodes for a migration.\nIn case of key collisions, values set on the VM objects\nare going to be preserved to ensure that addedNodeSelector\ncan only restrict but not bypass constraints already set on the VM object.\n+optional",
+		"vmiName": "The name of the VMI to perform the migration on. VMI must exist in the migration objects namespace",
 	}
 }
 
@@ -644,9 +643,8 @@ func (StopOptions) SwaggerDoc() map[string]string {
 
 func (MigrateOptions) SwaggerDoc() map[string]string {
 	return map[string]string{
-		"":                  "MigrateOptions may be provided on migrate request.",
-		"dryRun":            "When present, indicates that modifications should not be\npersisted. An invalid or unrecognized dryRun directive will\nresult in an error response and no further processing of the\nrequest. Valid values are:\n- All: all dry run stages will be processed\n+optional\n+listType=atomic",
-		"addedNodeSelector": "AddedNodeSelector is an additional selector that can be used to\ncomplement a NodeSelector or NodeAffinity as set on the VM\nto restrict the set of allowed target nodes for a migration.\nIn case of key collisions, values set on the VM objects\nare going to be preserved to ensure that addedNodeSelector\ncan only restrict but not bypass constraints already set on the VM object.\n+optional",
+		"":       "MigrateOptions may be provided on migrate request.",
+		"dryRun": "When present, indicates that modifications should not be\npersisted. An invalid or unrecognized dryRun directive will\nresult in an error response and no further processing of the\nrequest. Valid values are:\n- All: all dry run stages will be processed\n+optional\n+listType=atomic",
 	}
 }
 
@@ -905,7 +903,6 @@ func (DeveloperConfiguration) SwaggerDoc() map[string]string {
 		"useEmulation":                    "UseEmulation can be set to true to allow fallback to software emulation\nin case hardware-assisted emulation is not available. Defaults to false",
 		"cpuAllocationRatio":              "For each requested virtual CPU, CPUAllocationRatio defines how much physical CPU to request per VMI\nfrom the hosting node. The value is in fraction of a CPU thread (or core on non-hyperthreaded nodes).\nFor example, a value of 1 means 1 physical CPU thread per VMI CPU thread.\nA value of 100 would be 1% of a physical thread allocated for each requested VMI thread.\nThis option has no effect on VMIs that request dedicated CPUs. More information at:\nhttps://kubevirt.io/user-guide/operations/node_overcommit/#node-cpu-allocation-ratio\nDefaults to 10",
 		"minimumClusterTSCFrequency":      "Allow overriding the automatically determined minimum TSC frequency of the cluster\nand fixate the minimum to this frequency.",
-		"clusterProfiler":                 "Enable the ability to pprof profile KubeVirt control plane",
 	}
 }
 
