@@ -141,11 +141,6 @@ func (in *VirtualMachineCloneSpec) DeepCopyInto(out *VirtualMachineCloneSpec) {
 		*out = new(string)
 		**out = **in
 	}
-	if in.Patches != nil {
-		in, out := &in.Patches, &out.Patches
-		*out = make([]string, len(*in))
-		copy(*out, *in)
-	}
 	return
 }
 
