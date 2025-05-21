@@ -108,16 +108,6 @@ type VirtualMachinePoolSpec struct {
 	// Indicates that the pool is paused.
 	// +optional
 	Paused bool `json:"paused,omitempty" protobuf:"varint,7,opt,name=paused"`
-
-	// Options for the name generation in a pool.
-	// +optional
-	NameGeneration *VirtualMachinePoolNameGeneration `json:"nameGeneration,omitempty"`
-}
-
-// +k8s:openapi-gen=true
-type VirtualMachinePoolNameGeneration struct {
-	AppendIndexToConfigMapRefs *bool `json:"appendIndexToConfigMapRefs,omitempty"`
-	AppendIndexToSecretRefs    *bool `json:"appendIndexToSecretRefs,omitempty"`
 }
 
 // VirtualMachinePoolList is a list of VirtualMachinePool resources.

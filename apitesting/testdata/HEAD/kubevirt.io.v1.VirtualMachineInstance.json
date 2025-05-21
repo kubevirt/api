@@ -253,9 +253,6 @@
           "name": "nameValue",
           "i6300esb": {
             "action": "actionValue"
-          },
-          "diag288": {
-            "action": "actionValue"
           }
         },
         "interfaces": [
@@ -356,9 +353,6 @@
         }
       },
       "ioThreadsPolicy": "ioThreadsPolicyValue",
-      "ioThreads": {
-        "supplementalPoolThreadCount": 4294967269
-      },
       "chassis": {
         "manufacturer": "manufacturerValue",
         "version": "versionValue",
@@ -906,8 +900,7 @@
         "podInterfaceName": "podInterfaceNameValue",
         "interfaceName": "interfaceNameValue",
         "infoSource": "infoSourceValue",
-        "queueCount": -10,
-        "linkState": "linkStateValue"
+        "queueCount": -10
       }
     ],
     "guestOSInfo": {
@@ -952,7 +945,6 @@
         "progressTimeout": -15,
         "unsafeMigrationOverride": true,
         "allowPostCopy": true,
-        "allowWorkloadDisruption": true,
         "disableTLS": true,
         "network": "networkValue",
         "matchSELinuxLevelOnMigration": true
@@ -962,40 +954,7 @@
       ],
       "targetNodeTopology": "targetNodeTopologyValue",
       "sourcePersistentStatePVCName": "sourcePersistentStatePVCNameValue",
-      "targetPersistentStatePVCName": "targetPersistentStatePVCNameValue",
-      "sourceState": {
-        "node": "nodeValue",
-        "pod": "podValue",
-        "migrationUID": "migrationUIDValue",
-        "domainName": "domainNameValue",
-        "domainNamespace": "domainNamespaceValue",
-        "syncAddress": "syncAddressValue",
-        "persistentStatePVCName": "persistentStatePVCNameValue",
-        "nodeSelectors": {
-          "nodeSelectorsKey": "nodeSelectorsValue"
-        }
-      },
-      "targetState": {
-        "node": "nodeValue",
-        "pod": "podValue",
-        "migrationUID": "migrationUIDValue",
-        "domainName": "domainNameValue",
-        "domainNamespace": "domainNamespaceValue",
-        "syncAddress": "syncAddressValue",
-        "persistentStatePVCName": "persistentStatePVCNameValue",
-        "domainReadyTimestamp": "1980-01-01T01:01:01Z",
-        "domainDetected": true,
-        "nodeAddress": "nodeAddressValue",
-        "directMigrationNodePorts": {
-          "directMigrationNodePortsKey": -24
-        },
-        "attachmentPodUID": "attachmentPodUIDValue",
-        "cpuSet": [
-          -6
-        ],
-        "nodeTopology": "nodeTopologyValue"
-      },
-      "migrationNetworkType": "migrationNetworkTypeValue"
+      "targetPersistentStatePVCName": "targetPersistentStatePVCNameValue"
     },
     "migrationMethod": "migrationMethodValue",
     "migrationTransport": "migrationTransportValue",

@@ -109,8 +109,7 @@
           "nodeVerbosity": {
             "nodeVerbosityKey": 18446744073709551603
           }
-        },
-        "clusterProfiler": true
+        }
       },
       "emulatedMachines": [
         "emulatedMachinesValue"
@@ -126,7 +125,6 @@
         "progressTimeout": -15,
         "unsafeMigrationOverride": true,
         "allowPostCopy": true,
-        "allowWorkloadDisruption": true,
         "disableTLS": true,
         "network": "networkValue",
         "matchSELinuxLevelOnMigration": true

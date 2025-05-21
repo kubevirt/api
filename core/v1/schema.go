@@ -30,12 +30,11 @@ import (
 type IOThreadsPolicy string
 
 const (
-	IOThreadsPolicyShared           IOThreadsPolicy = "shared"
-	IOThreadsPolicyAuto             IOThreadsPolicy = "auto"
-	IOThreadsPolicySupplementalPool IOThreadsPolicy = "supplementalPool"
-	CPUModeHostPassthrough                          = "host-passthrough"
-	CPUModeHostModel                                = "host-model"
-	DefaultCPUModel                                 = CPUModeHostModel
+	IOThreadsPolicyShared  IOThreadsPolicy = "shared"
+	IOThreadsPolicyAuto    IOThreadsPolicy = "auto"
+	CPUModeHostPassthrough                 = "host-passthrough"
+	CPUModeHostModel                       = "host-model"
+	DefaultCPUModel                        = CPUModeHostModel
 )
 
 const HotplugDiskDir = "/var/run/kubevirt/hotplug-disks/"
@@ -201,12 +200,9 @@ type DomainSpec struct {
 	Devices Devices `json:"devices"`
 	// Controls whether or not disks will share IOThreads.
 	// Omitting IOThreadsPolicy disables use of IOThreads.
-	// One of: shared, auto, supplementalPool
+	// One of: shared, auto
 	// +optional
 	IOThreadsPolicy *IOThreadsPolicy `json:"ioThreadsPolicy,omitempty"`
-	// IOThreads specifies the IOThreads options.
-	// +optional
-	IOThreads *DiskIOThreads `json:"ioThreads,omitempty"`
 	// Chassis specifies the chassis info passed to the domain.
 	// +optional
 	Chassis *Chassis `json:"chassis,omitempty"`
@@ -361,7 +357,7 @@ type NUMAGuestMappingPassthrough struct {
 type NUMA struct {
 	// GuestMappingPassthrough will create an efficient guest topology based on host CPUs exclusively assigned to a pod.
 	// The created topology ensures that memory and CPUs on the virtual numa nodes never cross boundaries of host numa nodes.
-	// +optional
+	// +opitonal
 	GuestMappingPassthrough *NUMAGuestMappingPassthrough `json:"guestMappingPassthrough,omitempty"`
 }
 
@@ -547,7 +543,7 @@ type SoundDevice struct {
 }
 
 type TPMDevice struct {
-	// Enabled allows a user to explicitly disable the vTPM even when one is enabled by a preference referenced by the VirtualMachine
+	// Enabled allows a user to explictly disable the vTPM even when one is enabled by a preference referenced by the VirtualMachine
 	// Defaults to True
 	Enabled *bool `json:"enabled,omitempty"`
 	// Persistent indicates the state of the TPM device should be kept accross reboots
@@ -646,11 +642,7 @@ type Disk struct {
 	// +optional
 	DedicatedIOThread *bool `json:"dedicatedIOThread,omitempty"`
 	// Cache specifies which kvm disk cache mode should be used.
-	// Supported values are:
-	// none: Guest I/O not cached on the host, but may be kept in a disk cache.
-	// writethrough: Guest I/O cached on the host but written through to the physical medium. Slowest but with most guarantees.
-	// writeback: Guest I/O cached on the host.
-	// Defaults to none if the storage supports O_DIRECT, otherwise writethrough.
+	// Supported values are: CacheNone, CacheWriteThrough.
 	// +optional
 	Cache DriverCache `json:"cache,omitempty"`
 	// IO specifies which QEMU disk IO mode should be used.
@@ -726,7 +718,7 @@ type SEV struct {
 	// Note: due to security reasons it is not allowed to enable guest debugging. Therefore NoDebug flag is not exposed to users and is always true.
 	Policy *SEVPolicy `json:"policy,omitempty"`
 	// If specified, run the attestation process for a vmi.
-	// +optional
+	// +opitonal
 	Attestation *SEVAttestation `json:"attestation,omitempty"`
 	// Base64 encoded session blob.
 	Session string `json:"session,omitempty"`
@@ -869,6 +861,7 @@ type HotplugVolumeSource struct {
 
 type DataVolumeSource struct {
 	// Name of both the DataVolume and the PVC in the same namespace.
+	// After PVC population the DataVolume is garbage collected by default.
 	Name string `json:"name"`
 	// Hotpluggable indicates whether the volume can be hotplugged and hotunplugged.
 	// +optional
@@ -1237,21 +1230,10 @@ type WatchdogDevice struct {
 	// i6300esb watchdog device.
 	// +optional
 	I6300ESB *I6300ESBWatchdog `json:"i6300esb,omitempty"`
-
-	// diag288 watchdog device (specific to s390x architecture).
-	// +optional
-	Diag288 *Diag288Watchdog `json:"diag288,omitempty"`
 }
 
 // i6300esb watchdog device.
 type I6300ESBWatchdog struct {
-	// The action to take. Valid values are poweroff, reset, shutdown.
-	// Defaults to reset.
-	Action WatchdogAction `json:"action,omitempty"`
-}
-
-// diag288 watchdog device.
-type Diag288Watchdog struct {
 	// The action to take. Valid values are poweroff, reset, shutdown.
 	// Defaults to reset.
 	Action WatchdogAction `json:"action,omitempty"`
@@ -1298,11 +1280,7 @@ type Interface struct {
 	// +optional
 	ACPIIndex int `json:"acpiIndex,omitempty"`
 	// State represents the requested operational state of the interface.
-	// The supported values are:
-	// `absent`, expressing a request to remove the interface.
-	// `down`, expressing a request to set the link down.
-	// `up`, expressing a request to set the link up.
-	// Empty value functions as `up`.
+	// The (only) value supported is `absent`, expressing a request to remove the interface.
 	// +optional
 	State InterfaceState `json:"state,omitempty"`
 }
@@ -1310,9 +1288,7 @@ type Interface struct {
 type InterfaceState string
 
 const (
-	InterfaceStateAbsent   InterfaceState = "absent"
-	InterfaceStateLinkUp   InterfaceState = "up"
-	InterfaceStateLinkDown InterfaceState = "down"
+	InterfaceStateAbsent InterfaceState = "absent"
 )
 
 // Extra DHCP options to use in the interface.
@@ -1612,10 +1588,4 @@ type CPUTopology struct {
 	// Threads specifies the number of threads inside the vmi.
 	// Must be a value greater or equal 1.
 	Threads uint32 `json:"threads,omitempty"`
-}
-
-type DiskIOThreads struct {
-	// SupplementalPoolThreadCount specifies how many iothreads are allocated for the supplementalPool policy.
-	// +optional
-	SupplementalPoolThreadCount *uint32 `json:"supplementalPoolThreadCount,omitempty"`
 }
