@@ -69,11 +69,6 @@ spec:
         - emulatedMachinesValue
         machineType: machineTypeValue
         ovmfPath: ovmfPathValue
-      s390x:
-        emulatedMachines:
-        - emulatedMachinesValue
-        machineType: machineTypeValue
-        ovmfPath: ovmfPathValue
     autoCPULimitNamespaceLabelSelector:
       matchExpressions:
       - key: keyValue
