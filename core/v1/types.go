@@ -2669,10 +2669,8 @@ type VirtualMachineInstanceGuestOSUserList struct {
 
 // VirtualMachineGuestOSUser is the single user of the guest os
 type VirtualMachineInstanceGuestOSUser struct {
-	UserName string `json:"userName"`
-	Domain   string `json:"domain,omitempty"`
-
-	// Time of login of this user on the computer. If multiple instances of the user are logged in, the earliest login time is reported. The value is in fractional seconds since epoch time.
+	UserName  string  `json:"userName"`
+	Domain    string  `json:"domain,omitempty"`
 	LoginTime float64 `json:"loginTime,omitempty"`
 }
 
@@ -2943,7 +2941,6 @@ type ArchConfiguration struct {
 	Amd64               *ArchSpecificConfiguration `json:"amd64,omitempty"`
 	Arm64               *ArchSpecificConfiguration `json:"arm64,omitempty"`
 	Ppc64le             *ArchSpecificConfiguration `json:"ppc64le,omitempty"`
-	S390x               *ArchSpecificConfiguration `json:"s390x,omitempty"`
 	DefaultArchitecture string                     `json:"defaultArchitecture,omitempty"`
 }
 
