@@ -307,8 +307,7 @@
                   }
                 },
                 "shareable": true,
-                "errorPolicy": "errorPolicyValue",
-                "changedBlockTracking": true
+                "errorPolicy": "errorPolicyValue"
               }
             ],
             "watchdog": {
@@ -1221,8 +1220,7 @@
               }
             },
             "shareable": true,
-            "errorPolicy": "errorPolicyValue",
-            "changedBlockTracking": true
+            "errorPolicy": "errorPolicyValue"
           },
           "volumeSource": {
             "persistentVolumeClaim": {
@@ -1309,9 +1307,6 @@
           }
         ]
       }
-    },
-    "changedBlockTracking": {
-      "state": "stateValue"
     },
     "instancetypeRef": {
       "name": "nameValue",
