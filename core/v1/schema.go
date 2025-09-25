@@ -911,6 +911,8 @@ type ContainerDiskSource struct {
 	// More info: https://kubernetes.io/docs/concepts/containers/images#updating-images
 	// +optional
 	ImagePullPolicy v1.PullPolicy `json:"imagePullPolicy,omitempty"`
+
+	Hotpluggable bool `json:"hotpluggable,omitempty"`
 }
 
 // Exactly one of its members must be set.
