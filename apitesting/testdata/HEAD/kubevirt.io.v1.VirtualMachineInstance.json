@@ -109,8 +109,7 @@
           }
         },
         "acpi": {
-          "slicNameRef": "slicNameRefValue",
-          "msdmNameRef": "msdmNameRefValue"
+          "slicNameRef": "slicNameRefValue"
         }
       },
       "clock": {
@@ -247,8 +246,7 @@
               }
             },
             "shareable": true,
-            "errorPolicy": "errorPolicyValue",
-            "changedBlockTracking": true
+            "errorPolicy": "errorPolicyValue"
           }
         ],
         "watchdog": {
@@ -322,8 +320,6 @@
           {
             "name": "nameValue",
             "deviceName": "deviceNameValue",
-            "claimName": "claimNameValue",
-            "requestName": "requestNameValue",
             "virtualGPUOptions": {
               "display": {
                 "enabled": true,
@@ -336,11 +332,6 @@
           }
         ],
         "downwardMetrics": {},
-        "panicDevices": [
-          {
-            "model": "modelValue"
-          }
-        ],
         "filesystems": [
           {
             "name": "nameValue",
@@ -351,8 +342,6 @@
           {
             "name": "nameValue",
             "deviceName": "deviceNameValue",
-            "claimName": "claimNameValue",
-            "requestName": "requestNameValue",
             "tag": "tagValue"
           }
         ],
@@ -364,9 +353,6 @@
         "tpm": {
           "enabled": true,
           "persistent": true
-        },
-        "video": {
-          "type": "typeValue"
         }
       },
       "ioThreadsPolicy": "ioThreadsPolicyValue",
@@ -887,14 +873,7 @@
         }
       }
     ],
-    "architecture": "architectureValue",
-    "resourceClaims": [
-      {
-        "name": "nameValue",
-        "resourceClaimName": "resourceClaimNameValue",
-        "resourceClaimTemplateName": "resourceClaimTemplateNameValue"
-      }
-    ]
+    "architecture": "architectureValue"
   },
   "status": {
     "nodeName": "nodeNameValue",
@@ -983,44 +962,7 @@
       ],
       "targetNodeTopology": "targetNodeTopologyValue",
       "sourcePersistentStatePVCName": "sourcePersistentStatePVCNameValue",
-      "targetPersistentStatePVCName": "targetPersistentStatePVCNameValue",
-      "sourceState": {
-        "node": "nodeValue",
-        "pod": "podValue",
-        "migrationUID": "migrationUIDValue",
-        "domainName": "domainNameValue",
-        "domainNamespace": "domainNamespaceValue",
-        "syncAddress": "syncAddressValue",
-        "persistentStatePVCName": "persistentStatePVCNameValue",
-        "selinuxContext": "selinuxContextValue",
-        "virtualMachineInstanceUID": "virtualMachineInstanceUIDValue",
-        "nodeSelectors": {
-          "nodeSelectorsKey": "nodeSelectorsValue"
-        }
-      },
-      "targetState": {
-        "node": "nodeValue",
-        "pod": "podValue",
-        "migrationUID": "migrationUIDValue",
-        "domainName": "domainNameValue",
-        "domainNamespace": "domainNamespaceValue",
-        "syncAddress": "syncAddressValue",
-        "persistentStatePVCName": "persistentStatePVCNameValue",
-        "selinuxContext": "selinuxContextValue",
-        "virtualMachineInstanceUID": "virtualMachineInstanceUIDValue",
-        "domainReadyTimestamp": "1980-01-01T01:01:01Z",
-        "domainDetected": true,
-        "nodeAddress": "nodeAddressValue",
-        "directMigrationNodePorts": {
-          "directMigrationNodePortsKey": -24
-        },
-        "attachmentPodUID": "attachmentPodUIDValue",
-        "cpuSet": [
-          -6
-        ],
-        "nodeTopology": "nodeTopologyValue"
-      },
-      "migrationNetworkType": "migrationNetworkTypeValue"
+      "targetPersistentStatePVCName": "targetPersistentStatePVCNameValue"
     },
     "migrationMethod": "migrationMethodValue",
     "migrationTransport": "migrationTransportValue",
@@ -1131,37 +1073,6 @@
           "filesystemOverhead": "filesystemOverheadValue"
         }
       }
-    ],
-    "deviceStatus": {
-      "gpuStatuses": [
-        {
-          "name": "nameValue",
-          "deviceResourceClaimStatus": {
-            "name": "nameValue",
-            "resourceClaimName": "resourceClaimNameValue",
-            "attributes": {
-              "pciAddress": "pciAddressValue",
-              "mDevUUID": "mDevUUIDValue"
-            }
-          }
-        }
-      ],
-      "hostDeviceStatuses": [
-        {
-          "name": "nameValue",
-          "deviceResourceClaimStatus": {
-            "name": "nameValue",
-            "resourceClaimName": "resourceClaimNameValue",
-            "attributes": {
-              "pciAddress": "pciAddressValue",
-              "mDevUUID": "mDevUUIDValue"
-            }
-          }
-        }
-      ]
-    },
-    "changedBlockTracking": {
-      "state": "stateValue"
-    }
+    ]
   }
 }
