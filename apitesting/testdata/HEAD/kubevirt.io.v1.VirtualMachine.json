@@ -307,8 +307,7 @@
                   }
                 },
                 "shareable": true,
-                "errorPolicy": "errorPolicyValue",
-                "changedBlockTracking": true
+                "errorPolicy": "errorPolicyValue"
               }
             ],
             "watchdog": {
@@ -1028,10 +1027,7 @@
               "imageStream": "imageStreamValue",
               "pullMethod": "pullMethodValue",
               "secretRef": "secretRefValue",
-              "certConfigMap": "certConfigMapValue",
-              "platform": {
-                "architecture": "architectureValue"
-              }
+              "certConfigMap": "certConfigMapValue"
             },
             "pvc": {
               "namespace": "namespaceValue",
@@ -1051,8 +1047,7 @@
               "backingFile": "backingFileValue",
               "thumbprint": "thumbprintValue",
               "secretRef": "secretRefValue",
-              "initImageURL": "initImageURLValue",
-              "extraArgs": "extraArgsValue"
+              "initImageURL": "initImageURLValue"
             },
             "snapshot": {
               "namespace": "namespaceValue",
@@ -1225,8 +1220,7 @@
               }
             },
             "shareable": true,
-            "errorPolicy": "errorPolicyValue",
-            "changedBlockTracking": true
+            "errorPolicy": "errorPolicyValue"
           },
           "volumeSource": {
             "persistentVolumeClaim": {
@@ -1313,9 +1307,6 @@
           }
         ]
       }
-    },
-    "changedBlockTracking": {
-      "state": "stateValue"
     },
     "instancetypeRef": {
       "name": "nameValue",

@@ -169,8 +169,7 @@
               }
             },
             "acpi": {
-              "slicNameRef": "slicNameRefValue",
-              "msdmNameRef": "msdmNameRefValue"
+              "slicNameRef": "slicNameRefValue"
             }
           },
           "clock": {
@@ -381,8 +380,6 @@
               {
                 "name": "nameValue",
                 "deviceName": "deviceNameValue",
-                "claimName": "claimNameValue",
-                "requestName": "requestNameValue",
                 "virtualGPUOptions": {
                   "display": {
                     "enabled": true,
@@ -395,11 +392,6 @@
               }
             ],
             "downwardMetrics": {},
-            "panicDevices": [
-              {
-                "model": "modelValue"
-              }
-            ],
             "filesystems": [
               {
                 "name": "nameValue",
@@ -410,8 +402,6 @@
               {
                 "name": "nameValue",
                 "deviceName": "deviceNameValue",
-                "claimName": "claimNameValue",
-                "requestName": "requestNameValue",
                 "tag": "tagValue"
               }
             ],
@@ -423,9 +413,6 @@
             "tpm": {
               "enabled": true,
               "persistent": true
-            },
-            "video": {
-              "type": "typeValue"
             }
           },
           "ioThreadsPolicy": "ioThreadsPolicyValue",
@@ -946,14 +933,7 @@
             }
           }
         ],
-        "architecture": "architectureValue",
-        "resourceClaims": [
-          {
-            "name": "nameValue",
-            "resourceClaimName": "resourceClaimNameValue",
-            "resourceClaimTemplateName": "resourceClaimTemplateNameValue"
-          }
-        ]
+        "architecture": "architectureValue"
       }
     },
     "dataVolumeTemplates": [

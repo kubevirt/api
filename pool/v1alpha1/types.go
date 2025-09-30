@@ -28,8 +28,7 @@ import (
 )
 
 const (
-	VirtualMachinePoolKind                = "VirtualMachinePool"
-	VirtualMachinePoolControllerFinalizer = "pool.kubevirt.io/finalizer"
+	VirtualMachinePoolKind = "VirtualMachinePool"
 )
 
 const (
