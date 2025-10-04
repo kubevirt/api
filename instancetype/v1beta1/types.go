@@ -298,11 +298,6 @@ type VirtualMachinePreferenceSpec struct {
 	//
 	//+optional
 	PreferSpreadSocketToCoreRatio uint32 `json:"preferSpreadSocketToCoreRatio,omitempty"`
-
-	// PreferredArchitecture defines a prefeerred architecture for the VirtualMachine
-	//
-	//+optional
-	PreferredArchitecture *string `json:"preferredArchitecture,omitempty"`
 }
 
 type VolumePreferences struct {
@@ -634,11 +629,6 @@ type PreferenceRequirements struct {
 	//
 	//+optional
 	Memory *MemoryPreferenceRequirement `json:"memory,omitempty"`
-
-	// Required Architecture of the VM referencing this preference
-	//
-	//+optional
-	Architecture *string `json:"architecture,omitempty"`
 }
 
 type CPUPreferenceRequirement struct {
