@@ -17,18 +17,18 @@
  *
  */
 
-package v1beta1
+package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
-	"kubevirt.io/api/pool"
+	"kubevirt.io/api/instancetype"
 )
 
 // SchemeGroupVersion is group version used to register these objects
-var SchemeGroupVersion = schema.GroupVersion{Group: pool.GroupName, Version: "v1beta1"}
+var SchemeGroupVersion = schema.GroupVersion{Group: instancetype.GroupName, Version: "v1alpha1"}
 
 // Kind takes an unqualified kind and returns back a Group qualified GroupKind
 func Kind(kind string) schema.GroupKind {
@@ -45,13 +45,21 @@ var (
 	SchemeBuilder = runtime.NewSchemeBuilder(addKnownTypes)
 	// AddToScheme is a global function that registers this API group & version to a scheme
 	AddToScheme = SchemeBuilder.AddToScheme
+	// required by conversion-gen
+	localSchemeBuilder = &SchemeBuilder
 )
 
 // Adds the list of known types to Scheme.
 func addKnownTypes(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(SchemeGroupVersion,
-		&VirtualMachinePool{},
-		&VirtualMachinePoolList{},
+		&VirtualMachineInstancetype{},
+		&VirtualMachineInstancetypeList{},
+		&VirtualMachineClusterInstancetype{},
+		&VirtualMachineClusterInstancetypeList{},
+		&VirtualMachinePreference{},
+		&VirtualMachinePreferenceList{},
+		&VirtualMachineClusterPreference{},
+		&VirtualMachineClusterPreferenceList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil
