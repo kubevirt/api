@@ -69,11 +69,6 @@ spec:
         - emulatedMachinesValue
         machineType: machineTypeValue
         ovmfPath: ovmfPathValue
-      s390x:
-        emulatedMachines:
-        - emulatedMachinesValue
-        machineType: machineTypeValue
-        ovmfPath: ovmfPathValue
     autoCPULimitNamespaceLabelSelector:
       matchExpressions:
       - key: keyValue
@@ -82,23 +77,6 @@ spec:
         - valuesValue
       matchLabels:
         matchLabelsKey: matchLabelsValue
-    changedBlockTrackingLabelSelectors:
-      namespaceLabelSelector:
-        matchExpressions:
-        - key: keyValue
-          operator: operatorValue
-          values:
-          - valuesValue
-        matchLabels:
-          matchLabelsKey: matchLabelsValue
-      virtualMachineLabelSelector:
-        matchExpressions:
-        - key: keyValue
-          operator: operatorValue
-          values:
-          - valuesValue
-        matchLabels:
-          matchLabelsKey: matchLabelsValue
     commonInstancetypesDeployment:
       enabled: true
     controllerConfiguration:
