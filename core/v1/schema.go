@@ -57,18 +57,6 @@ const (
 	Pvpanic PanicDeviceModel = "pvpanic"
 )
 
-// RebootPolicy specifies how the domain should behave when a guest reboot is triggered.
-// +kubebuilder:validation:Enum=Reboot;Terminate
-type RebootPolicy string
-
-const (
-	// RebootPolicyReboot allows the guest to silently reboot without notifying KubeVirt (default behavior).
-	RebootPolicyReboot RebootPolicy = "Reboot"
-	// RebootPolicyTerminate terminates the VMI on guest reboot, allowing the VMI to be recreated
-	// by the controllers (e.g., to pick up new configuration from VM).
-	RebootPolicyTerminate RebootPolicy = "Terminate"
-)
-
 /*
  ATTENTION: Rerun code generators when comments on structs or fields are modified.
 */
@@ -233,13 +221,6 @@ type DomainSpec struct {
 	// Launch Security setting of the vmi.
 	// +optional
 	LaunchSecurity *LaunchSecurity `json:"launchSecurity,omitempty"`
-	// RebootPolicy specifies how the guest should behave on reboot.
-	// Reboot (default): The guest is allowed to reboot silently.
-	// Terminate: The VMI will be terminated on guest reboot, allowing
-	// higher level controllers (such as the VM controller) to recreate
-	// the VMI with any updated configuration such as boot order changes.
-	// +optional
-	RebootPolicy *RebootPolicy `json:"rebootPolicy,omitempty"`
 }
 
 // Chassis specifies the chassis info passed to the domain.
@@ -1014,28 +995,6 @@ type ContainerDiskSource struct {
 	ImagePullPolicy v1.PullPolicy `json:"imagePullPolicy,omitempty"`
 }
 
-type UtilityVolumeType string
-
-const (
-	// MemoryDump represents a utility volume which will be used to collect memory dump
-	MemoryDump UtilityVolumeType = "MemoryDump"
-
-	// Backup represents a utility volume which will be used to collect backup output
-	Backup UtilityVolumeType = "Backup"
-)
-
-type UtilityVolume struct {
-	// UtilityVolume's name.
-	// Must be unique within the vmi, including regular Volumes.
-	Name string `json:"name"`
-	// PersistentVolumeClaimVolumeSource defines the PVC
-	// that is hotplugged to virt-launcher
-	v1.PersistentVolumeClaimVolumeSource `json:",inline"`
-	// Type represents the type of the utility volume.
-	// +optional
-	Type *UtilityVolumeType `json:"type,omitempty"`
-}
-
 // Exactly one of its members must be set.
 type ClockOffset struct {
 	// UTC sets the guest clock to UTC on each boot. If an offset is specified,
@@ -1213,10 +1172,8 @@ type Features struct {
 }
 
 type SyNICTimer struct {
-	FeatureState `json:",inline"`
-
-	// +optional
-	Direct *FeatureState `json:"direct,omitempty"`
+	Enabled *bool         `json:"enabled,omitempty"`
+	Direct  *FeatureState `json:"direct,omitempty"`
 }
 
 // Represents if a feature is enabled or disabled.
@@ -1228,8 +1185,10 @@ type FeatureState struct {
 }
 
 type FeatureAPIC struct {
-	FeatureState `json:",inline"`
-
+	// Enabled determines if the feature should be enabled or disabled on the guest.
+	// Defaults to true.
+	// +optional
+	Enabled *bool `json:"enabled,omitempty"`
 	// EndOfInterrupt enables the end of interrupt notification in the guest.
 	// Defaults to false.
 	// +optional
@@ -1237,8 +1196,10 @@ type FeatureAPIC struct {
 }
 
 type FeatureSpinlocks struct {
-	FeatureState `json:",inline"`
-
+	// Enabled determines if the feature should be enabled or disabled on the guest.
+	// Defaults to true.
+	// +optional
+	Enabled *bool `json:"enabled,omitempty"`
 	// Retries indicates the number of retries.
 	// Must be a value greater or equal 4096.
 	// Defaults to 4096.
@@ -1247,23 +1208,13 @@ type FeatureSpinlocks struct {
 }
 
 type FeatureVendorID struct {
-	FeatureState `json:",inline"`
-
+	// Enabled determines if the feature should be enabled or disabled on the guest.
+	// Defaults to true.
+	// +optional
+	Enabled *bool `json:"enabled,omitempty"`
 	// VendorID sets the hypervisor vendor id, visible to the vmi.
 	// String up to twelve characters.
 	VendorID string `json:"vendorid,omitempty"`
-}
-
-type TLBFlush struct {
-	FeatureState `json:",inline"`
-
-	// Direct allows sending the TLB flush command directly to the hypervisor.
-	// It can be useful to optimize performance in nested virtualization cases, such as Windows VBS.
-	// +optional
-	Direct *FeatureState `json:"direct,omitempty"`
-	// Extended allows the guest to execute partial TLB flushes. It can be helpful for general purpose workloads.
-	// +optional
-	Extended *FeatureState `json:"extended,omitempty"`
 }
 
 // Hyperv specific features.
@@ -1314,7 +1265,7 @@ type FeatureHyperv struct {
 	// TLBFlush improves performances in overcommited environments. Requires vpindex.
 	// Defaults to the machine type setting.
 	// +optional
-	TLBFlush *TLBFlush `json:"tlbflush,omitempty"`
+	TLBFlush *FeatureState `json:"tlbflush,omitempty"`
 	// IPI improves performances in overcommited environments. Requires vpindex.
 	// Defaults to the machine type setting.
 	// +optional
@@ -1499,7 +1450,6 @@ type InterfaceBindingMethod struct {
 	// Deprecated: Removed in v1.3
 	// +optional
 	DeprecatedPasst *DeprecatedInterfacePasst `json:"passt,omitempty"`
-	PasstBinding    *InterfacePasstBinding    `json:"passtBinding,omitempty"`
 }
 
 // InterfaceBridge connects to a given network via a linux bridge.
@@ -1524,9 +1474,6 @@ type DeprecatedInterfaceMacvtap struct{}
 // DeprecatedInterfacePasst is an alias to the deprecated InterfacePasst
 // Deprecated: Removed in v1.3
 type DeprecatedInterfacePasst struct{}
-
-// InterfacePasstBinding connects to a given network using passt usermode networking.
-type InterfacePasstBinding struct{}
 
 // PluginBinding represents a binding implemented in a plugin.
 type PluginBinding struct {

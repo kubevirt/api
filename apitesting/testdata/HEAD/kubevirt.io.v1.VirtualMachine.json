@@ -251,13 +251,7 @@
                 "enabled": true
               },
               "tlbflush": {
-                "enabled": true,
-                "direct": {
-                  "enabled": true
-                },
-                "extended": {
-                  "enabled": true
-                }
+                "enabled": true
               },
               "ipi": {
                 "enabled": true
@@ -337,7 +331,6 @@
                 "sriov": {},
                 "macvtap": {},
                 "passt": {},
-                "passtBinding": {},
                 "binding": {
                   "name": "nameValue"
                 },
@@ -459,8 +452,7 @@
             },
             "snp": {},
             "tdx": {}
-          },
-          "rebootPolicy": "rebootPolicyValue"
+          }
         },
         "nodeSelector": {
           "nodeSelectorKey": "nodeSelectorValue"
@@ -965,14 +957,6 @@
             "resourceClaimName": "resourceClaimNameValue",
             "resourceClaimTemplateName": "resourceClaimTemplateNameValue"
           }
-        ],
-        "utilityVolumes": [
-          {
-            "name": "nameValue",
-            "claimName": "claimNameValue",
-            "readOnly": true,
-            "type": "typeValue"
-          }
         ]
       }
     },
@@ -1335,22 +1319,7 @@
       }
     },
     "changedBlockTracking": {
-      "state": "stateValue",
-      "backupStatus": {
-        "backupName": "backupNameValue",
-        "startTimestamp": "1986-01-01T01:01:01Z",
-        "endTimestamp": "1988-01-01T01:01:01Z",
-        "completed": true,
-        "failed": true,
-        "backupMsg": "backupMsgValue",
-        "checkpointName": "checkpointNameValue",
-        "volumes": [
-          {
-            "volumeName": "volumeNameValue",
-            "diskTarget": "diskTargetValue"
-          }
-        ]
-      }
+      "state": "stateValue"
     },
     "instancetypeRef": {
       "name": "nameValue",

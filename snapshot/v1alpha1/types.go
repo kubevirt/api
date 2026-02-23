@@ -80,7 +80,7 @@ const (
 	VMSnapshotOnlineSnapshotIndication Indication = "Online"
 	VMSnapshotNoGuestAgentIndication   Indication = "NoGuestAgent"
 	VMSnapshotGuestAgentIndication     Indication = "GuestAgent"
-	VMSnapshotQuiesceTimeoutIndication Indication = "QuiesceTimeout"
+	VMSnapshotQuiesceFailedIndication  Indication = "QuiesceFailed"
 	VMSnapshotPausedIndication         Indication = "Paused"
 )
 
