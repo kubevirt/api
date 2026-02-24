@@ -837,6 +837,10 @@
               "claimName": "claimNameValue",
               "readOnly": true,
               "hotpluggable": true
+            },
+            "containerPath": {
+              "path": "pathValue",
+              "readOnly": true
             }
           }
         ],
@@ -1062,7 +1066,8 @@
               "url": "urlValue",
               "diskId": "diskIdValue",
               "secretRef": "secretRefValue",
-              "certConfigMap": "certConfigMapValue"
+              "certConfigMap": "certConfigMapValue",
+              "insecureSkipVerify": true
             },
             "vddk": {
               "url": "urlValue",
