@@ -693,7 +693,6 @@ status:
     guestAtBoot: "0"
     guestCurrent: "0"
     guestRequested: "0"
-    memoryOverhead: "0"
   migratedVolumes:
   - destinationPVCInfo:
       accessModes:
@@ -766,7 +765,6 @@ status:
     - -12
     targetDirectMigrationNodePorts:
       targetDirectMigrationNodePortsKey: -30
-    targetMemoryOverhead: "0"
     targetNode: targetNodeValue
     targetNodeAddress: targetNodeAddressValue
     targetNodeDomainDetected: true

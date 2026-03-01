@@ -3522,11 +3522,6 @@ func (in *MemoryStatus) DeepCopyInto(out *MemoryStatus) {
 		x := (*in).DeepCopy()
 		*out = &x
 	}
-	if in.MemoryOverhead != nil {
-		in, out := &in.MemoryOverhead, &out.MemoryOverhead
-		x := (*in).DeepCopy()
-		*out = &x
-	}
 	return
 }
 
@@ -6090,11 +6085,6 @@ func (in *VirtualMachineInstanceMigrationState) DeepCopyInto(out *VirtualMachine
 		in, out := &in.TargetState, &out.TargetState
 		*out = new(VirtualMachineInstanceMigrationTargetState)
 		(*in).DeepCopyInto(*out)
-	}
-	if in.TargetMemoryOverhead != nil {
-		in, out := &in.TargetMemoryOverhead, &out.TargetMemoryOverhead
-		x := (*in).DeepCopy()
-		*out = &x
 	}
 	return
 }

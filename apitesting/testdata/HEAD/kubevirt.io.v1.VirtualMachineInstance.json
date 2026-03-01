@@ -1048,8 +1048,7 @@
         ],
         "nodeTopology": "nodeTopologyValue"
       },
-      "migrationNetworkType": "migrationNetworkTypeValue",
-      "targetMemoryOverhead": "0"
+      "migrationNetworkType": "migrationNetworkTypeValue"
     },
     "migrationMethod": "migrationMethodValue",
     "migrationTransport": "migrationTransportValue",
@@ -1124,8 +1123,7 @@
     "memory": {
       "guestAtBoot": "0",
       "guestCurrent": "0",
-      "guestRequested": "0",
-      "memoryOverhead": "0"
+      "guestRequested": "0"
     },
     "migratedVolumes": [
       {
