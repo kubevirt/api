@@ -3084,6 +3084,11 @@ func (in *KubeVirtConfiguration) DeepCopyInto(out *KubeVirtConfiguration) {
 		*out = new(ConfidentialComputeConfiguration)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.RoleAggregationStrategy != nil {
+		in, out := &in.RoleAggregationStrategy, &out.RoleAggregationStrategy
+		*out = new(RoleAggregationStrategy)
+		**out = **in
+	}
 	return
 }
 
@@ -3514,6 +3519,11 @@ func (in *MemoryStatus) DeepCopyInto(out *MemoryStatus) {
 	}
 	if in.GuestRequested != nil {
 		in, out := &in.GuestRequested, &out.GuestRequested
+		x := (*in).DeepCopy()
+		*out = &x
+	}
+	if in.MemoryOverhead != nil {
+		in, out := &in.MemoryOverhead, &out.MemoryOverhead
 		x := (*in).DeepCopy()
 		*out = &x
 	}
@@ -6080,6 +6090,11 @@ func (in *VirtualMachineInstanceMigrationState) DeepCopyInto(out *VirtualMachine
 		in, out := &in.TargetState, &out.TargetState
 		*out = new(VirtualMachineInstanceMigrationTargetState)
 		(*in).DeepCopyInto(*out)
+	}
+	if in.TargetMemoryOverhead != nil {
+		in, out := &in.TargetMemoryOverhead, &out.TargetMemoryOverhead
+		x := (*in).DeepCopy()
+		*out = &x
 	}
 	return
 }

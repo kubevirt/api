@@ -1055,6 +1055,9 @@ type VirtualMachineInstanceMigrationState struct {
 	TargetState *VirtualMachineInstanceMigrationTargetState `json:"targetState,omitempty"`
 	// The type of migration network, either 'pod' or 'migration'
 	MigrationNetworkType MigrationNetworkType `json:"migrationNetworkType,omitempty"`
+	// TargetMemoryOverhead is the memory overhead of the target virt-launcher pod
+	// +optional
+	TargetMemoryOverhead *resource.Quantity `json:"targetMemoryOverhead,omitempty"`
 }
 
 type MigrationAbortStatus string
@@ -1228,6 +1231,8 @@ const (
 	EphemeralBackupObject = "kubevirt.io/ephemeral-backup-object"
 	// This annotation represents that the annotated object is for temporary use during pod/volume provisioning
 	EphemeralProvisioningObject string = "kubevirt.io/ephemeral-provisioning"
+	// This annotation stores the memory overhead calculated for the virt-launcher pod
+	MemoryOverheadAnnotationBytes string = "kubevirt.io/memory-overhead-bytes"
 	// This annotation indicates the VMI contains an ephemeral hotplug volume
 	EphemeralHotplugAnnotation string = "kubevirt.io/ephemeral-hotplug-volumes"
 
@@ -1402,6 +1407,8 @@ const (
 	// The label is used to store this value when memory hotplug is requested as it may change
 	// between the creation of the target pod and when the evaluation of `MemoryHotplugReadyLabel`
 	// happens.
+	// TODO: Remove this label and related code once VmiMemoryOverheadReport feature gate is GA
+	// and we are sure that all VMIs include the MemoryOverhead status field
 	MemoryHotplugOverheadRatioLabel string = "kubevirt.io/memory-hotplug-overhead-ratio"
 
 	// AutoMemoryLimitsRatioLabel allows to use a custom ratio for auto memory limits calculation.
@@ -3131,6 +3138,16 @@ type KubeVirtConfiguration struct {
 	// QGS configuration for attestation on the Intel TDX Platform
 	// +nullable
 	ConfidentialCompute *ConfidentialComputeConfiguration `json:"confidentialCompute,omitempty"`
+
+	// RoleAggregationStrategy controls whether RBAC cluster roles should be aggregated
+	// to the default Kubernetes roles (admin, edit, view).
+	// When set to "AggregateToDefault" (default) or not specified, the aggregate-to-* labels are added to the cluster roles.
+	// When set to "Manual", the labels are not added, and roles will not be aggregated to the default roles.
+	// Setting this field to "Manual" requires the OptOutRoleAggregation feature gate to be enabled.
+	// This is an Alpha feature and subject to change.
+	// +optional
+	// +kubebuilder:validation:Enum=AggregateToDefault;Manual
+	RoleAggregationStrategy *RoleAggregationStrategy `json:"roleAggregationStrategy,omitempty"`
 }
 
 // QGSConfiguration holds QGS configuration
@@ -3210,6 +3227,17 @@ type VirtTemplateDeployment struct {
 	// +nullable
 	Enabled *bool `json:"enabled,omitempty"`
 }
+
+// RoleAggregationStrategy represents the strategy for RBAC role aggregation
+// +kubebuilder:validation:Enum=AggregateToDefault;Manual
+type RoleAggregationStrategy string
+
+const (
+	// RoleAggregationStrategyAggregateToDefault enables aggregation of KubeVirt ClusterRoles to default Kubernetes roles
+	RoleAggregationStrategyAggregateToDefault RoleAggregationStrategy = "AggregateToDefault"
+	// RoleAggregationStrategyManual disables aggregation, requiring manual RBAC assignments for KubeVirt resources
+	RoleAggregationStrategyManual RoleAggregationStrategy = "Manual"
+)
 
 type VMRolloutStrategy string
 
