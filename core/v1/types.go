@@ -770,8 +770,6 @@ const (
 	VirtualMachineInstanceMigrationBlockedByUtilityVolumes VirtualMachineInstanceMigrationConditionType = "migrationBlockedByUtilityVolumes"
 	// VirtualMachineInstanceDecentralizedMigrationBlocked indicates that a decentralized migration is blocked
 	VirtualMachineInstanceDecentralizedMigrationBlocked VirtualMachineInstanceMigrationConditionType = "decentralizedMigrationBlocked"
-	// VirtualMachineInstanceMigrationBlockedByBackup indicates that migration is waiting for backup to complete or abort
-	VirtualMachineInstanceMigrationBlockedByBackup VirtualMachineInstanceMigrationConditionType = "migrationBlockedByBackup"
 )
 
 type VirtualMachineInstanceCondition struct {
@@ -1386,10 +1384,6 @@ const (
 	// This annotation might be empty if the source is not a recognized actor (an admin for example).
 	// This could be useful to distinguish evictions originated from the descheduler.
 	EvictionSourceAnnotation = "kubevirt.io/eviction-source"
-
-	// QGSSocketPathAnnotation specifies the path to the TDX Quote Generation Service socket.
-	// This annotation is set by virt-handler based on the cluster configuration.
-	QGSSocketPathAnnotation = "kubevirt.io/qgs-socket-path"
 
 	// AllowAccessClusterServicesNPLabel is a pod label to be set by virt-components to indicate that they require
 	// access to cluster services otherwise blocked by the strict network policy (NP).
@@ -3084,10 +3078,6 @@ type KubeVirtConfiguration struct {
 	// +nullable
 	ChangedBlockTrackingLabelSelectors *ChangedBlockTrackingSelectors `json:"changedBlockTrackingLabelSelectors,omitempty"`
 
-	// QGS configuration for attestation on the Intel TDX Platform
-	// +nullable
-	ConfidentialCompute *ConfidentialComputeConfiguration `json:"confidentialCompute,omitempty"`
-
 	// RoleAggregationStrategy controls whether RBAC cluster roles should be aggregated
 	// to the default Kubernetes roles (admin, edit, view).
 	// When set to "AggregateToDefault" (default) or not specified, the aggregate-to-* labels are added to the cluster roles.
@@ -3097,26 +3087,6 @@ type KubeVirtConfiguration struct {
 	// +optional
 	// +kubebuilder:validation:Enum=AggregateToDefault;Manual
 	RoleAggregationStrategy *RoleAggregationStrategy `json:"roleAggregationStrategy,omitempty"`
-}
-
-// QGSConfiguration holds QGS configuration
-type TDXAttestationConfiguration struct {
-	// Indicates whether TDX VM should enforce the existence of QGS (required for attestation) to be scheduled
-	// +kubebuilder:default=false
-	Enforced *bool `json:"enforced,omitempty"`
-	// Socket path pointing to the Quote Generation Service
-	// +kubebuilder:default=/var/run/tdx-qgs/qgs.socket
-	QgsSocketPath *string `json:"qgsSocketPath,omitempty"`
-}
-
-type TDXConfiguration struct {
-	Attestation *TDXAttestationConfiguration `json:"attestation,omitempty"`
-}
-
-type ConfidentialComputeConfiguration struct {
-	// TDX configuration for attestation on the Intel TDX Platform
-	// +nullable
-	TDX *TDXConfiguration `json:"tdx,omitempty"`
 }
 
 const (
