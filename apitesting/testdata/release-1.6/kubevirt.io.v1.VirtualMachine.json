@@ -300,16 +300,14 @@
                 "blockSize": {
                   "custom": {
                     "logical": 18446744073709551609,
-                    "physical": 18446744073709551608,
-                    "discardGranularity": 18446744073709551598
+                    "physical": 18446744073709551608
                   },
                   "matchVolume": {
                     "enabled": true
                   }
                 },
                 "shareable": true,
-                "errorPolicy": "errorPolicyValue",
-                "changedBlockTracking": true
+                "errorPolicy": "errorPolicyValue"
               }
             ],
             "watchdog": {
@@ -449,9 +447,7 @@
               "attestation": {},
               "session": "sessionValue",
               "dhCert": "dhCertValue"
-            },
-            "snp": {},
-            "tdx": {}
+            }
           }
         },
         "nodeSelector": {
@@ -1031,10 +1027,7 @@
               "imageStream": "imageStreamValue",
               "pullMethod": "pullMethodValue",
               "secretRef": "secretRefValue",
-              "certConfigMap": "certConfigMapValue",
-              "platform": {
-                "architecture": "architectureValue"
-              }
+              "certConfigMap": "certConfigMapValue"
             },
             "pvc": {
               "namespace": "namespaceValue",
@@ -1054,8 +1047,7 @@
               "backingFile": "backingFileValue",
               "thumbprint": "thumbprintValue",
               "secretRef": "secretRefValue",
-              "initImageURL": "initImageURLValue",
-              "extraArgs": "extraArgsValue"
+              "initImageURL": "initImageURLValue"
             },
             "snapshot": {
               "namespace": "namespaceValue",
@@ -1221,16 +1213,14 @@
             "blockSize": {
               "custom": {
                 "logical": 18446744073709551609,
-                "physical": 18446744073709551608,
-                "discardGranularity": 18446744073709551598
+                "physical": 18446744073709551608
               },
               "matchVolume": {
                 "enabled": true
               }
             },
             "shareable": true,
-            "errorPolicy": "errorPolicyValue",
-            "changedBlockTracking": true
+            "errorPolicy": "errorPolicyValue"
           },
           "volumeSource": {
             "persistentVolumeClaim": {
@@ -1317,9 +1307,6 @@
           }
         ]
       }
-    },
-    "changedBlockTracking": {
-      "state": "stateValue"
     },
     "instancetypeRef": {
       "name": "nameValue",
