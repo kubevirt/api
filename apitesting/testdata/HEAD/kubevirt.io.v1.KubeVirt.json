@@ -416,14 +416,6 @@
           ]
         }
       },
-      "confidentialCompute": {
-        "tdx": {
-          "attestation": {
-            "enforced": true,
-            "qgsSocketPath": "qgsSocketPathValue"
-          }
-        }
-      },
       "roleAggregationStrategy": "roleAggregationStrategyValue"
     },
     "infra": {
