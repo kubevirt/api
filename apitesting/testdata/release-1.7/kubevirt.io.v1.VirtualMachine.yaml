@@ -119,7 +119,6 @@ spec:
         imageio:
           certConfigMap: certConfigMapValue
           diskId: diskIdValue
-          insecureSkipVerify: true
           secretRef: secretRefValue
           url: urlValue
         pvc:
@@ -512,7 +511,6 @@ spec:
             model: modelValue
             name: nameValue
             passt: {}
-            passtBinding: {}
             pciAddress: pciAddressValue
             ports:
             - name: nameValue
@@ -573,11 +571,7 @@ spec:
                 enabled: true
               enabled: true
             tlbflush:
-              direct:
-                enabled: true
               enabled: true
-              extended:
-                enabled: true
             vapic:
               enabled: true
             vendorid:
@@ -632,10 +626,6 @@ spec:
           hugepages:
             pageSize: pageSizeValue
           maxGuest: "0"
-          reservedOverhead:
-            addedOverhead: "0"
-            memLock: memLockValue
-        rebootPolicy: rebootPolicyValue
         resources:
           limits:
             limitsKey: "0"
@@ -728,11 +718,6 @@ spec:
         nodeTaintsPolicy: nodeTaintsPolicyValue
         topologyKey: topologyKeyValue
         whenUnsatisfiable: whenUnsatisfiableValue
-      utilityVolumes:
-      - claimName: claimNameValue
-        name: nameValue
-        readOnly: true
-        type: typeValue
       volumes:
       - cloudInitConfigDrive:
           networkData: networkDataValue
@@ -761,9 +746,6 @@ spec:
           imagePullPolicy: imagePullPolicyValue
           imagePullSecret: imagePullSecretValue
           path: pathValue
-        containerPath:
-          path: pathValue
-          readOnly: true
         dataVolume:
           hotpluggable: true
           name: nameValue
@@ -814,19 +796,6 @@ spec:
   updateVolumesStrategy: updateVolumesStrategyValue
 status:
   changedBlockTracking:
-    backupStatus:
-      backupMsg: backupMsgValue
-      backupName: backupNameValue
-      checkpointName: checkpointNameValue
-      completed: true
-      endTimestamp: "1988-01-01T01:01:01Z"
-      failed: true
-      startTimestamp: "1986-01-01T01:01:01Z"
-      volumes:
-      - dataEndpoint: dataEndpointValue
-        diskTarget: diskTargetValue
-        mapEndpoint: mapEndpointValue
-        volumeName: volumeNameValue
     state: stateValue
   conditions:
   - lastProbeTime: "1987-01-01T01:01:01Z"
