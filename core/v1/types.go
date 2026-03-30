@@ -1204,6 +1204,22 @@ const (
 	IgnitionAnnotation           string = "kubevirt.io/ignitiondata"
 	PlacePCIDevicesOnRootComplex string = "kubevirt.io/placePCIDevicesOnRootComplex"
 
+	// PciTopologyVersionAnnotation documents which PCI topology scheme was used to
+	// define the domain. Used to preserve PCI device addresses across reboots and upgrades.
+	PciTopologyVersionAnnotation string = "kubevirt.io/pci-topology-version"
+	// PciInterfaceSlotCountAnnotation stores the frozen total of placeholder interfaces
+	// plus boot-time non-hotplug interfaces. Set by virt-handler on detected v2 VMs.
+	// On subsequent boots, the placeholder count is derived as
+	// max(0, slotTotal - currentInterfaceCount), absorbing interface additions/removals
+	// while stopped without shifting PCI addresses.
+	PciInterfaceSlotCountAnnotation string = "kubevirt.io/pci-interface-slot-count"
+	// PciTopologyVersionV2 indicates the VM was created with the v2 hotplug port formula
+	// from PR #14754, which is unstable across spec changes.
+	PciTopologyVersionV2 string = "v2"
+	// PciTopologyVersionV3 indicates the VM uses v1 placeholders (for address stability)
+	// plus direct pcie-root-port controllers (for hotplug capacity).
+	PciTopologyVersionV3 string = "v3"
+
 	// This label represents supported cpu features on the node
 	CPUFeatureLabel = "cpu-feature.node.kubevirt.io/"
 	// This label represents supported cpu models on the node
@@ -1332,8 +1348,8 @@ const (
 	// vm has the pod networking bind with a bridge
 	AllowPodBridgeNetworkLiveMigrationAnnotation string = "kubevirt.io/allow-pod-bridge-network-live-migration"
 
-	// DeprecatedVirtualMachineGenerationAnnotation is the generation of a Virtual Machine.
-	DeprecatedVirtualMachineGenerationAnnotation string = "kubevirt.io/vm-generation"
+	// VirtualMachineGenerationAnnotation is the generation of a Virtual Machine.
+	VirtualMachineGenerationAnnotation string = "kubevirt.io/vm-generation"
 
 	// MigrationTargetReadyTimestamp indicates the time at which the target node
 	// detected that the VMI became active on the target during live migration.
@@ -1386,10 +1402,6 @@ const (
 	// This annotation might be empty if the source is not a recognized actor (an admin for example).
 	// This could be useful to distinguish evictions originated from the descheduler.
 	EvictionSourceAnnotation = "kubevirt.io/eviction-source"
-
-	// QGSSocketPathAnnotation specifies the path to the TDX Quote Generation Service socket.
-	// This annotation is set by virt-handler based on the cluster configuration.
-	QGSSocketPathAnnotation = "kubevirt.io/qgs-socket-path"
 
 	// AllowAccessClusterServicesNPLabel is a pod label to be set by virt-components to indicate that they require
 	// access to cluster services otherwise blocked by the strict network policy (NP).
@@ -3084,10 +3096,6 @@ type KubeVirtConfiguration struct {
 	// +nullable
 	ChangedBlockTrackingLabelSelectors *ChangedBlockTrackingSelectors `json:"changedBlockTrackingLabelSelectors,omitempty"`
 
-	// QGS configuration for attestation on the Intel TDX Platform
-	// +nullable
-	ConfidentialCompute *ConfidentialComputeConfiguration `json:"confidentialCompute,omitempty"`
-
 	// RoleAggregationStrategy controls whether RBAC cluster roles should be aggregated
 	// to the default Kubernetes roles (admin, edit, view).
 	// When set to "AggregateToDefault" (default) or not specified, the aggregate-to-* labels are added to the cluster roles.
@@ -3097,26 +3105,6 @@ type KubeVirtConfiguration struct {
 	// +optional
 	// +kubebuilder:validation:Enum=AggregateToDefault;Manual
 	RoleAggregationStrategy *RoleAggregationStrategy `json:"roleAggregationStrategy,omitempty"`
-}
-
-// QGSConfiguration holds QGS configuration
-type TDXAttestationConfiguration struct {
-	// Indicates whether TDX VM should enforce the existence of QGS (required for attestation) to be scheduled
-	// +kubebuilder:default=false
-	Enforced *bool `json:"enforced,omitempty"`
-	// Socket path pointing to the Quote Generation Service
-	// +kubebuilder:default=/var/run/tdx-qgs/qgs.socket
-	QgsSocketPath *string `json:"qgsSocketPath,omitempty"`
-}
-
-type TDXConfiguration struct {
-	Attestation *TDXAttestationConfiguration `json:"attestation,omitempty"`
-}
-
-type ConfidentialComputeConfiguration struct {
-	// TDX configuration for attestation on the Intel TDX Platform
-	// +nullable
-	TDX *TDXConfiguration `json:"tdx,omitempty"`
 }
 
 const (
