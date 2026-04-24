@@ -141,11 +141,7 @@
               "pageSize": "pageSizeValue"
             },
             "guest": "0",
-            "maxGuest": "0",
-            "reservedOverhead": {
-              "addedOverhead": "0",
-              "memLock": "memLockValue"
-            }
+            "maxGuest": "0"
           },
           "machine": {
             "type": "typeValue"
@@ -173,8 +169,7 @@
               }
             },
             "acpi": {
-              "slicNameRef": "slicNameRefValue",
-              "msdmNameRef": "msdmNameRefValue"
+              "slicNameRef": "slicNameRefValue"
             }
           },
           "clock": {
@@ -255,13 +250,7 @@
                 "enabled": true
               },
               "tlbflush": {
-                "enabled": true,
-                "direct": {
-                  "enabled": true
-                },
-                "extended": {
-                  "enabled": true
-                }
+                "enabled": true
               },
               "ipi": {
                 "enabled": true
@@ -310,16 +299,14 @@
                 "blockSize": {
                   "custom": {
                     "logical": 18446744073709551609,
-                    "physical": 18446744073709551608,
-                    "discardGranularity": 18446744073709551598
+                    "physical": 18446744073709551608
                   },
                   "matchVolume": {
                     "enabled": true
                   }
                 },
                 "shareable": true,
-                "errorPolicy": "errorPolicyValue",
-                "changedBlockTracking": true
+                "errorPolicy": "errorPolicyValue"
               }
             ],
             "watchdog": {
@@ -341,7 +328,6 @@
                 "sriov": {},
                 "macvtap": {},
                 "passt": {},
-                "passtBinding": {},
                 "binding": {
                   "name": "nameValue"
                 },
@@ -394,8 +380,6 @@
               {
                 "name": "nameValue",
                 "deviceName": "deviceNameValue",
-                "claimName": "claimNameValue",
-                "requestName": "requestNameValue",
                 "virtualGPUOptions": {
                   "display": {
                     "enabled": true,
@@ -408,11 +392,6 @@
               }
             ],
             "downwardMetrics": {},
-            "panicDevices": [
-              {
-                "model": "modelValue"
-              }
-            ],
             "filesystems": [
               {
                 "name": "nameValue",
@@ -423,8 +402,6 @@
               {
                 "name": "nameValue",
                 "deviceName": "deviceNameValue",
-                "claimName": "claimNameValue",
-                "requestName": "requestNameValue",
                 "tag": "tagValue"
               }
             ],
@@ -436,9 +413,6 @@
             "tpm": {
               "enabled": true,
               "persistent": true
-            },
-            "video": {
-              "type": "typeValue"
             }
           },
           "ioThreadsPolicy": "ioThreadsPolicyValue",
@@ -460,11 +434,8 @@
               "attestation": {},
               "session": "sessionValue",
               "dhCert": "dhCertValue"
-            },
-            "snp": {},
-            "tdx": {}
-          },
-          "rebootPolicy": "rebootPolicyValue"
+            }
+          }
         },
         "nodeSelector": {
           "nodeSelectorKey": "nodeSelectorValue"
@@ -841,10 +812,6 @@
               "claimName": "claimNameValue",
               "readOnly": true,
               "hotpluggable": true
-            },
-            "containerPath": {
-              "path": "pathValue",
-              "readOnly": true
             }
           }
         ],
@@ -966,22 +933,7 @@
             }
           }
         ],
-        "architecture": "architectureValue",
-        "resourceClaims": [
-          {
-            "name": "nameValue",
-            "resourceClaimName": "resourceClaimNameValue",
-            "resourceClaimTemplateName": "resourceClaimTemplateNameValue"
-          }
-        ],
-        "utilityVolumes": [
-          {
-            "name": "nameValue",
-            "claimName": "claimNameValue",
-            "readOnly": true,
-            "type": "typeValue"
-          }
-        ]
+        "architecture": "architectureValue"
       }
     },
     "dataVolumeTemplates": [
@@ -1055,10 +1007,7 @@
               "imageStream": "imageStreamValue",
               "pullMethod": "pullMethodValue",
               "secretRef": "secretRefValue",
-              "certConfigMap": "certConfigMapValue",
-              "platform": {
-                "architecture": "architectureValue"
-              }
+              "certConfigMap": "certConfigMapValue"
             },
             "pvc": {
               "namespace": "namespaceValue",
@@ -1070,8 +1019,7 @@
               "url": "urlValue",
               "diskId": "diskIdValue",
               "secretRef": "secretRefValue",
-              "certConfigMap": "certConfigMapValue",
-              "insecureSkipVerify": true
+              "certConfigMap": "certConfigMapValue"
             },
             "vddk": {
               "url": "urlValue",
@@ -1079,8 +1027,7 @@
               "backingFile": "backingFileValue",
               "thumbprint": "thumbprintValue",
               "secretRef": "secretRefValue",
-              "initImageURL": "initImageURLValue",
-              "extraArgs": "extraArgsValue"
+              "initImageURL": "initImageURLValue"
             },
             "snapshot": {
               "namespace": "namespaceValue",
@@ -1246,16 +1193,14 @@
             "blockSize": {
               "custom": {
                 "logical": 18446744073709551609,
-                "physical": 18446744073709551608,
-                "discardGranularity": 18446744073709551598
+                "physical": 18446744073709551608
               },
               "matchVolume": {
                 "enabled": true
               }
             },
             "shareable": true,
-            "errorPolicy": "errorPolicyValue",
-            "changedBlockTracking": true
+            "errorPolicy": "errorPolicyValue"
           },
           "volumeSource": {
             "persistentVolumeClaim": {
@@ -1339,26 +1284,6 @@
               "preallocated": true,
               "filesystemOverhead": "filesystemOverheadValue"
             }
-          }
-        ]
-      }
-    },
-    "changedBlockTracking": {
-      "state": "stateValue",
-      "backupStatus": {
-        "backupName": "backupNameValue",
-        "startTimestamp": "1986-01-01T01:01:01Z",
-        "endTimestamp": "1988-01-01T01:01:01Z",
-        "completed": true,
-        "failed": true,
-        "backupMsg": "backupMsgValue",
-        "checkpointName": "checkpointNameValue",
-        "volumes": [
-          {
-            "volumeName": "volumeNameValue",
-            "diskTarget": "diskTargetValue",
-            "dataEndpoint": "dataEndpointValue",
-            "mapEndpoint": "mapEndpointValue"
           }
         ]
       }

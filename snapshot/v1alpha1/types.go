@@ -77,21 +77,12 @@ type VirtualMachineSnapshotSpec struct {
 type Indication string
 
 const (
-	VMSnapshotOnlineSnapshotIndication  Indication = "Online"
-	VMSnapshotNoGuestAgentIndication    Indication = "NoGuestAgent"
-	VMSnapshotGuestAgentIndication      Indication = "GuestAgent"
-	VMSnapshotQuiesceTimeoutIndication  Indication = "QuiesceTimeout"
-	VMSnapshotPausedIndication          Indication = "Paused"
-	VMSnapshotPartialSnapshotIndication Indication = "PartialSnapshot"
+	VMSnapshotOnlineSnapshotIndication Indication = "Online"
+	VMSnapshotNoGuestAgentIndication   Indication = "NoGuestAgent"
+	VMSnapshotGuestAgentIndication     Indication = "GuestAgent"
+	VMSnapshotQuiesceTimeoutIndication Indication = "QuiesceTimeout"
+	VMSnapshotPausedIndication         Indication = "Paused"
 )
-
-// SourceIndication provides an indication of the source VM with its description message
-type SourceIndication struct {
-	// Indication is the indication type
-	Indication Indication `json:"indication"`
-	// Message provides a description message of the indication
-	Message string `json:"message"`
-}
 
 // VirtualMachineSnapshotPhase is the current phase of the VirtualMachineSnapshot
 type VirtualMachineSnapshotPhase string
@@ -129,14 +120,9 @@ type VirtualMachineSnapshotStatus struct {
 	// +optional
 	Conditions []Condition `json:"conditions,omitempty"`
 
-	// Deprecated: Use SourceIndications instead. This field will be removed in a future version.
 	// +optional
 	// +listType=set
 	Indications []Indication `json:"indications,omitempty"`
-
-	// +optional
-	// +listType=atomic
-	SourceIndications []SourceIndication `json:"sourceIndications,omitempty"`
 
 	// +optional
 	SnapshotVolumes *SnapshotVolumesLists `json:"snapshotVolumes,omitempty"`
