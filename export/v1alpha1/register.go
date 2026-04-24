@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Copyright 2025 Red Hat, Inc.
+ * Copyright 2022 Red Hat, Inc.
  *
  */
 
@@ -24,17 +24,11 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
-	"kubevirt.io/api/backup"
+	"kubevirt.io/api/export"
 )
 
 // SchemeGroupVersion is group version used to register these objects
-var SchemeGroupVersion = schema.GroupVersion{Group: backup.GroupName, Version: "v1alpha1"}
-
-var (
-	// GroupVersionKind
-	VirtualMachineBackupGroupVersionKind        = schema.GroupVersionKind{Group: backup.GroupName, Version: SchemeGroupVersion.Version, Kind: "VirtualMachineBackup"}
-	VirtualMachineBackupTrackerGroupVersionKind = schema.GroupVersionKind{Group: backup.GroupName, Version: SchemeGroupVersion.Version, Kind: "VirtualMachineBackupTracker"}
-)
+var SchemeGroupVersion = schema.GroupVersion{Group: export.GroupName, Version: "v1alpha1"}
 
 // Kind takes an unqualified kind and returns back a Group qualified GroupKind
 func Kind(kind string) schema.GroupKind {
@@ -56,10 +50,8 @@ var (
 // Adds the list of known types to Scheme.
 func addKnownTypes(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(SchemeGroupVersion,
-		&VirtualMachineBackup{},
-		&VirtualMachineBackupList{},
-		&VirtualMachineBackupTracker{},
-		&VirtualMachineBackupTrackerList{},
+		&VirtualMachineExport{},
+		&VirtualMachineExportList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil
