@@ -243,7 +243,6 @@ spec:
       disks:
       - blockSize:
           custom:
-            discardGranularity: 18446744073709551598
             logical: 18446744073709551609
             physical: 18446744073709551608
           matchVolume:
@@ -254,7 +253,6 @@ spec:
           bus: busValue
           readonly: true
           tray: trayValue
-        changedBlockTracking: true
         dedicatedIOThread: true
         disk:
           bus: busValue
@@ -275,10 +273,8 @@ spec:
       - name: nameValue
         virtiofs: {}
       gpus:
-      - claimName: claimNameValue
-        deviceName: deviceNameValue
+      - deviceName: deviceNameValue
         name: nameValue
-        requestName: requestNameValue
         tag: tagValue
         virtualGPUOptions:
           display:
@@ -286,10 +282,8 @@ spec:
             ramFB:
               enabled: true
       hostDevices:
-      - claimName: claimNameValue
-        deviceName: deviceNameValue
+      - deviceName: deviceNameValue
         name: nameValue
-        requestName: requestNameValue
         tag: tagValue
       inputs:
       - bus: busValue
@@ -315,7 +309,6 @@ spec:
         model: modelValue
         name: nameValue
         passt: {}
-        passtBinding: {}
         pciAddress: pciAddressValue
         ports:
         - name: nameValue
@@ -327,8 +320,6 @@ spec:
         tag: tagValue
       logSerialConsole: true
       networkInterfaceMultiqueue: true
-      panicDevices:
-      - model: modelValue
       rng: {}
       sound:
         model: modelValue
@@ -337,8 +328,6 @@ spec:
         enabled: true
         persistent: true
       useVirtioTransitional: true
-      video:
-        type: typeValue
       watchdog:
         diag288:
           action: actionValue
@@ -376,11 +365,7 @@ spec:
             enabled: true
           enabled: true
         tlbflush:
-          direct:
-            enabled: true
           enabled: true
-          extended:
-            enabled: true
         vapic:
           enabled: true
         vendorid:
@@ -398,7 +383,6 @@ spec:
         enabled: true
     firmware:
       acpi:
-        msdmNameRef: msdmNameRefValue
         slicNameRef: slicNameRefValue
       bootloader:
         bios:
@@ -426,8 +410,6 @@ spec:
         policy:
           encryptedState: true
         session: sessionValue
-      snp: {}
-      tdx: {}
     machine:
       type: typeValue
     memory:
@@ -435,10 +417,6 @@ spec:
       hugepages:
         pageSize: pageSizeValue
       maxGuest: "0"
-      reservedOverhead:
-        addedOverhead: "0"
-        memLock: memLockValue
-    rebootPolicy: rebootPolicyValue
     resources:
       limits:
         limitsKey: "0"
@@ -500,10 +478,6 @@ spec:
       host: hostValue
       port: portValue
     timeoutSeconds: -14
-  resourceClaims:
-  - name: nameValue
-    resourceClaimName: resourceClaimNameValue
-    resourceClaimTemplateName: resourceClaimTemplateNameValue
   schedulerName: schedulerNameValue
   startStrategy: startStrategyValue
   subdomain: subdomainValue
@@ -531,11 +505,6 @@ spec:
     nodeTaintsPolicy: nodeTaintsPolicyValue
     topologyKey: topologyKeyValue
     whenUnsatisfiable: whenUnsatisfiableValue
-  utilityVolumes:
-  - claimName: claimNameValue
-    name: nameValue
-    readOnly: true
-    type: typeValue
   volumes:
   - cloudInitConfigDrive:
       networkData: networkDataValue
@@ -564,9 +533,6 @@ spec:
       imagePullPolicy: imagePullPolicyValue
       imagePullSecret: imagePullSecretValue
       path: pathValue
-    containerPath:
-      path: pathValue
-      readOnly: true
     dataVolume:
       hotpluggable: true
       name: nameValue
@@ -618,21 +584,6 @@ status:
   VSOCKCID: 4294967288
   activePods:
     activePodsKey: activePodsValue
-  changedBlockTracking:
-    backupStatus:
-      backupMsg: backupMsgValue
-      backupName: backupNameValue
-      checkpointName: checkpointNameValue
-      completed: true
-      endTimestamp: "1988-01-01T01:01:01Z"
-      failed: true
-      startTimestamp: "1986-01-01T01:01:01Z"
-      volumes:
-      - dataEndpoint: dataEndpointValue
-        diskTarget: diskTargetValue
-        mapEndpoint: mapEndpointValue
-        volumeName: volumeNameValue
-    state: stateValue
   conditions:
   - lastProbeTime: "1987-01-01T01:01:01Z"
     lastTransitionTime: "1982-01-01T01:01:01Z"
@@ -678,7 +629,6 @@ status:
     guestAtBoot: "0"
     guestCurrent: "0"
     guestRequested: "0"
-    memoryOverhead: "0"
   migratedVolumes:
   - destinationPVCInfo:
       accessModes:
@@ -725,33 +675,18 @@ status:
       parallelOutboundMigrationsPerNode: 4294967263
       progressTimeout: -15
       unsafeMigrationOverride: true
-      utilityVolumesTimeout: -21
-    migrationNetworkType: migrationNetworkTypeValue
     migrationPolicyName: migrationPolicyNameValue
     migrationUid: migrationUidValue
     mode: modeValue
     sourceNode: sourceNodeValue
     sourcePersistentStatePVCName: sourcePersistentStatePVCNameValue
     sourcePod: sourcePodValue
-    sourceState:
-      domainName: domainNameValue
-      domainNamespace: domainNamespaceValue
-      migrationUID: migrationUIDValue
-      node: nodeValue
-      nodeSelectors:
-        nodeSelectorsKey: nodeSelectorsValue
-      persistentStatePVCName: persistentStatePVCNameValue
-      pod: podValue
-      selinuxContext: selinuxContextValue
-      syncAddress: syncAddressValue
-      virtualMachineInstanceUID: virtualMachineInstanceUIDValue
     startTimestamp: "1986-01-01T01:01:01Z"
     targetAttachmentPodUID: targetAttachmentPodUIDValue
     targetCPUSet:
     - -12
     targetDirectMigrationNodePorts:
       targetDirectMigrationNodePortsKey: -30
-    targetMemoryOverhead: "0"
     targetNode: targetNodeValue
     targetNodeAddress: targetNodeAddressValue
     targetNodeDomainDetected: true
@@ -759,25 +694,6 @@ status:
     targetNodeTopology: targetNodeTopologyValue
     targetPersistentStatePVCName: targetPersistentStatePVCNameValue
     targetPod: targetPodValue
-    targetState:
-      attachmentPodUID: attachmentPodUIDValue
-      cpuSet:
-      - -6
-      directMigrationNodePorts:
-        directMigrationNodePortsKey: -24
-      domainDetected: true
-      domainName: domainNameValue
-      domainNamespace: domainNamespaceValue
-      domainReadyTimestamp: "1980-01-01T01:01:01Z"
-      migrationUID: migrationUIDValue
-      node: nodeValue
-      nodeAddress: nodeAddressValue
-      nodeTopology: nodeTopologyValue
-      persistentStatePVCName: persistentStatePVCNameValue
-      pod: podValue
-      selinuxContext: selinuxContextValue
-      syncAddress: syncAddressValue
-      virtualMachineInstanceUID: virtualMachineInstanceUIDValue
   migrationTransport: migrationTransportValue
   nodeName: nodeNameValue
   phase: phaseValue
