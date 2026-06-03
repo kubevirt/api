@@ -180,8 +180,7 @@ type VirtualMachineInstanceSpec struct {
 	// This is an alpha field and requires enabling the
 	// DynamicResourceAllocation feature gate in kubernetes
 	//  https://kubernetes.io/docs/concepts/scheduling-eviction/dynamic-resource-allocation/
-	// This field should only be configured if one of the feature-gates GPUsWithDRA, HostDevicesWithDRA,
-	// or NetworkDevicesWithDRA is enabled.
+	// This field should only be configured if one of the feature-gates GPUsWithDRA or HostDevicesWithDRA is enabled.
 	// This feature is in alpha.
 	//
 	// +listType=map
@@ -303,9 +302,6 @@ type VirtualMachineInstanceStatus struct {
 
 	// VSOCKCID is used to track the allocated VSOCK CID in the VM.
 	// +optional
-	// +kubebuilder:validation:Format:=int64
-	// +kubebuilder:validation:Minimum:=0
-	// +kubebuilder:validation:Maximum:=4294967295
 	VSOCKCID *uint32 `json:"VSOCKCID,omitempty"`
 
 	// SELinuxContext is the actual SELinux context of the virt-launcher pod
@@ -408,18 +404,12 @@ type VolumeStatus struct {
 
 // KernelInfo show info about the kernel image
 type KernelInfo struct {
-	// +kubebuilder:validation:Format:=int64
-	// +kubebuilder:validation:Minimum:=0
-	// +kubebuilder:validation:Maximum:=4294967295
 	// Checksum is the checksum of the kernel image
 	Checksum uint32 `json:"checksum,omitempty"`
 }
 
 // InitrdInfo show info about the initrd file
 type InitrdInfo struct {
-	// +kubebuilder:validation:Format:=int64
-	// +kubebuilder:validation:Minimum:=0
-	// +kubebuilder:validation:Maximum:=4294967295
 	// Checksum is the checksum of the initrd file
 	Checksum uint32 `json:"checksum,omitempty"`
 }
@@ -454,9 +444,6 @@ type HotplugVolumeStatus struct {
 
 // ContainerDiskInfo shows info about the containerdisk
 type ContainerDiskInfo struct {
-	// +kubebuilder:validation:Format:=int64
-	// +kubebuilder:validation:Minimum:=0
-	// +kubebuilder:validation:Maximum:=4294967295
 	// Checksum is the checksum of the rootdisk or kernel artifacts inside the containerdisk
 	Checksum uint32 `json:"checksum,omitempty"`
 }
@@ -1353,11 +1340,6 @@ const (
 	// representation of the name to ensure uniqueness.
 	VirtualMachineInstanceIDLabel = "vmi.kubevirt.io/id"
 
-	// PersistentReservationLabelPrefix is the label key prefix used to mark
-	// virt-launcher pods that use SCSI PersistentReservation on a given PVC.
-	// The suffix is the PVC's UID.
-	PersistentReservationLabelPrefix = "pr.kubevirt.io/"
-
 	// PVCMemoryDumpAnnotation is the name of the memory dump representing the vm name,
 	// pvc name and the timestamp the memory dump was collected
 	PVCMemoryDumpAnnotation string = "kubevirt.io/memory-dump"
@@ -1420,10 +1402,6 @@ const (
 	// This annotation might be empty if the source is not a recognized actor (an admin for example).
 	// This could be useful to distinguish evictions originated from the descheduler.
 	EvictionSourceAnnotation = "kubevirt.io/eviction-source"
-
-	// QGSSocketPathAnnotation specifies the path to the TDX Quote Generation Service socket.
-	// This annotation is set by virt-handler based on the cluster configuration.
-	QGSSocketPathAnnotation = "kubevirt.io/qgs-socket-path"
 
 	// AllowAccessClusterServicesNPLabel is a pod label to be set by virt-components to indicate that they require
 	// access to cluster services otherwise blocked by the strict network policy (NP).
@@ -2037,10 +2015,10 @@ const (
 	// VirtualMachineStatusUnschedulable indicates that an error has occurred while scheduling the virtual machine,
 	// e.g. due to unsatisfiable resource requests or unsatisfiable scheduling constraints.
 	VirtualMachineStatusUnschedulable VirtualMachinePrintableStatus = "ErrorUnschedulable"
-	// VirtualMachineStatusErrImagePull indicates that an error has occurred while pulling an image for
+	// VirtualMachineStatusErrImagePull indicates that an error has occured while pulling an image for
 	// a containerDisk VM volume.
 	VirtualMachineStatusErrImagePull VirtualMachinePrintableStatus = "ErrImagePull"
-	// VirtualMachineStatusImagePullBackOff indicates that an error has occurred while pulling an image for
+	// VirtualMachineStatusImagePullBackOff indicates that an error has occured while pulling an image for
 	// a containerDisk VM volume, and that kubelet is backing off before retrying.
 	VirtualMachineStatusImagePullBackOff VirtualMachinePrintableStatus = "ImagePullBackOff"
 	// VirtualMachineStatusPvcNotFound indicates that the virtual machine references a PVC volume which doesn't exist.
@@ -3124,14 +3102,6 @@ type KubeVirtConfiguration struct {
 	// +nullable
 	ChangedBlockTrackingLabelSelectors *ChangedBlockTrackingSelectors `json:"changedBlockTrackingLabelSelectors,omitempty"`
 
-	// PersistentReservationConfiguration controls the deployment of additional resources required for using SCSI persistent reservation in VMs
-	// +nullable
-	PersistentReservationConfiguration *PersistentReservationConfiguration `json:"persistentReservationConfiguration,omitempty"`
-
-	// QGS configuration for attestation on the Intel TDX Platform
-	// +nullable
-	ConfidentialCompute *ConfidentialComputeConfiguration `json:"confidentialCompute,omitempty"`
-
 	// RoleAggregationStrategy controls whether RBAC cluster roles should be aggregated
 	// to the default Kubernetes roles (admin, edit, view).
 	// When set to "AggregateToDefault" (default) or not specified, the aggregate-to-* labels are added to the cluster roles.
@@ -3141,26 +3111,6 @@ type KubeVirtConfiguration struct {
 	// +optional
 	// +kubebuilder:validation:Enum=AggregateToDefault;Manual
 	RoleAggregationStrategy *RoleAggregationStrategy `json:"roleAggregationStrategy,omitempty"`
-}
-
-// QGSConfiguration holds QGS configuration
-type TDXAttestationConfiguration struct {
-	// Indicates whether TDX VM should enforce the existence of QGS (required for attestation) to be scheduled
-	// +kubebuilder:default=false
-	Enforced *bool `json:"enforced,omitempty"`
-	// Socket path pointing to the Quote Generation Service
-	// +kubebuilder:default=/var/run/tdx-qgs/qgs.socket
-	QgsSocketPath *string `json:"qgsSocketPath,omitempty"`
-}
-
-type TDXConfiguration struct {
-	Attestation *TDXAttestationConfiguration `json:"attestation,omitempty"`
-}
-
-type ConfidentialComputeConfiguration struct {
-	// TDX configuration for attestation on the Intel TDX Platform
-	// +nullable
-	TDX *TDXConfiguration `json:"tdx,omitempty"`
 }
 
 const (
@@ -3886,11 +3836,4 @@ type ObjectGraphOptions struct {
 	IncludeOptionalNodes *bool `json:"includeOptionalNodes,omitempty"`
 	// LabelSelector is used to filter nodes in the graph based on their labels.
 	LabelSelector *metav1.LabelSelector `json:"labelSelector,omitempty"`
-}
-
-type PersistentReservationConfiguration struct {
-	// Enabled controls the deployment of additional resources like the pr-helper container
-	// for enabling the use of the SCSI persistent reservation VMs, defaults to False.
-	// +nullable
-	Enabled *bool `json:"enabled,omitempty"`
 }

@@ -39,7 +39,7 @@ func (VirtualMachineInstanceSpec) SwaggerDoc() map[string]string {
 		"dnsConfig":                     "Specifies the DNS parameters of a pod.\nParameters specified here will be merged to the generated DNS\nconfiguration based on DNSPolicy.\n+optional",
 		"accessCredentials":             "Specifies a set of public keys to inject into the vm guest\n+listType=atomic\n+optional\n+kubebuilder:validation:MaxItems:=256",
 		"architecture":                  "Specifies the architecture of the vm guest you are attempting to run. Defaults to the compiled architecture of the KubeVirt components",
-		"resourceClaims":                "ResourceClaims define which ResourceClaims must be allocated\nand reserved before the VMI, hence virt-launcher pod is allowed to start. The resources\nwill be made available to the domain which consumes them\nby name.\n\nThis is an alpha field and requires enabling the\nDynamicResourceAllocation feature gate in kubernetes\n https://kubernetes.io/docs/concepts/scheduling-eviction/dynamic-resource-allocation/\nThis field should only be configured if one of the feature-gates GPUsWithDRA, HostDevicesWithDRA,\nor NetworkDevicesWithDRA is enabled.\nThis feature is in alpha.\n\n+listType=map\n+listMapKey=name\n+optional",
+		"resourceClaims":                "ResourceClaims define which ResourceClaims must be allocated\nand reserved before the VMI, hence virt-launcher pod is allowed to start. The resources\nwill be made available to the domain which consumes them\nby name.\n\nThis is an alpha field and requires enabling the\nDynamicResourceAllocation feature gate in kubernetes\n https://kubernetes.io/docs/concepts/scheduling-eviction/dynamic-resource-allocation/\nThis field should only be configured if one of the feature-gates GPUsWithDRA or HostDevicesWithDRA is enabled.\nThis feature is in alpha.\n\n+listType=map\n+listMapKey=name\n+optional",
 		"utilityVolumes":                "List of utility volumes that can be mounted to the vmi virt-launcher pod\nwithout having a matching disk in the domain.\nUsed to collect data for various operational workflows.\n+kubebuilder:validation:MaxItems:=256\n+listType=map\n+listMapKey=name\n+optional",
 	}
 }
@@ -79,7 +79,7 @@ func (VirtualMachineInstanceStatus) SwaggerDoc() map[string]string {
 		"topologyHints":                 "+optional",
 		"virtualMachineRevisionName":    "VirtualMachineRevisionName is used to get the vm revision of the vmi when doing\nan online vm snapshot\n+optional",
 		"runtimeUser":                   "RuntimeUser is used to determine what user will be used in launcher\n+optional",
-		"VSOCKCID":                      "VSOCKCID is used to track the allocated VSOCK CID in the VM.\n+optional\n+kubebuilder:validation:Format:=int64\n+kubebuilder:validation:Minimum:=0\n+kubebuilder:validation:Maximum:=4294967295",
+		"VSOCKCID":                      "VSOCKCID is used to track the allocated VSOCK CID in the VM.\n+optional",
 		"selinuxContext":                "SELinuxContext is the actual SELinux context of the virt-launcher pod\n+optional",
 		"machine":                       "Machine shows the final resulting qemu machine type. This can be different\nthan the machine type selected in the spec, due to qemus machine type alias mechanism.\n+optional",
 		"currentCPUTopology":            "CurrentCPUTopology specifies the current CPU topology used by the VM workload.\nCurrent topology may differ from the desired topology in the spec while CPU hotplug\ntakes place.",
@@ -130,14 +130,14 @@ func (VolumeStatus) SwaggerDoc() map[string]string {
 func (KernelInfo) SwaggerDoc() map[string]string {
 	return map[string]string{
 		"":         "KernelInfo show info about the kernel image",
-		"checksum": "+kubebuilder:validation:Format:=int64\n+kubebuilder:validation:Minimum:=0\n+kubebuilder:validation:Maximum:=4294967295\nChecksum is the checksum of the kernel image",
+		"checksum": "Checksum is the checksum of the kernel image",
 	}
 }
 
 func (InitrdInfo) SwaggerDoc() map[string]string {
 	return map[string]string{
 		"":         "InitrdInfo show info about the initrd file",
-		"checksum": "+kubebuilder:validation:Format:=int64\n+kubebuilder:validation:Minimum:=0\n+kubebuilder:validation:Maximum:=4294967295\nChecksum is the checksum of the initrd file",
+		"checksum": "Checksum is the checksum of the initrd file",
 	}
 }
 
@@ -170,7 +170,7 @@ func (HotplugVolumeStatus) SwaggerDoc() map[string]string {
 func (ContainerDiskInfo) SwaggerDoc() map[string]string {
 	return map[string]string{
 		"":         "ContainerDiskInfo shows info about the containerdisk",
-		"checksum": "+kubebuilder:validation:Format:=int64\n+kubebuilder:validation:Minimum:=0\n+kubebuilder:validation:Maximum:=4294967295\nChecksum is the checksum of the rootdisk or kernel artifacts inside the containerdisk",
+		"checksum": "Checksum is the checksum of the rootdisk or kernel artifacts inside the containerdisk",
 	}
 }
 
@@ -888,27 +888,7 @@ func (KubeVirtConfiguration) SwaggerDoc() map[string]string {
 		"instancetype":                       "Instancetype configuration\n+nullable",
 		"hypervisors":                        "Hypervisors holds information regarding the hypervisor configurations supported on this cluster.\n+listType=atomic\n+kubebuilder:validation:MaxItems:=1",
 		"changedBlockTrackingLabelSelectors": "ChangedBlockTrackingLabelSelectors defines label selectors. VMs matching these selectors will have changed block tracking enabled.\nEnabling changedBlockTracking is mandatory for performing storage-agnostic backups and incremental backups.\n+nullable",
-		"persistentReservationConfiguration": "PersistentReservationConfiguration controls the deployment of additional resources required for using SCSI persistent reservation in VMs\n+nullable",
-		"confidentialCompute":                "QGS configuration for attestation on the Intel TDX Platform\n+nullable",
 		"roleAggregationStrategy":            "RoleAggregationStrategy controls whether RBAC cluster roles should be aggregated\nto the default Kubernetes roles (admin, edit, view).\nWhen set to \"AggregateToDefault\" (default) or not specified, the aggregate-to-* labels are added to the cluster roles.\nWhen set to \"Manual\", the labels are not added, and roles will not be aggregated to the default roles.\nSetting this field to \"Manual\" requires the OptOutRoleAggregation feature gate to be enabled.\nThis is an Alpha feature and subject to change.\n+optional\n+kubebuilder:validation:Enum=AggregateToDefault;Manual",
-	}
-}
-
-func (TDXAttestationConfiguration) SwaggerDoc() map[string]string {
-	return map[string]string{
-		"":              "QGSConfiguration holds QGS configuration",
-		"enforced":      "Indicates whether TDX VM should enforce the existence of QGS (required for attestation) to be scheduled\n+kubebuilder:default=false",
-		"qgsSocketPath": "Socket path pointing to the Quote Generation Service\n+kubebuilder:default=/var/run/tdx-qgs/qgs.socket",
-	}
-}
-
-func (TDXConfiguration) SwaggerDoc() map[string]string {
-	return map[string]string{}
-}
-
-func (ConfidentialComputeConfiguration) SwaggerDoc() map[string]string {
-	return map[string]string{
-		"tdx": "TDX configuration for attestation on the Intel TDX Platform\n+nullable",
 	}
 }
 
@@ -1247,11 +1227,5 @@ func (ObjectGraphOptions) SwaggerDoc() map[string]string {
 		"":                     "ObjectGraphOptions holds options for the object graph.",
 		"includeOptionalNodes": "IncludeOptionalNodes indicates whether to include optional nodes in the graph.\nTrue by default.",
 		"labelSelector":        "LabelSelector is used to filter nodes in the graph based on their labels.",
-	}
-}
-
-func (PersistentReservationConfiguration) SwaggerDoc() map[string]string {
-	return map[string]string{
-		"enabled": "Enabled controls the deployment of additional resources like the pr-helper container\nfor enabling the use of the SCSI persistent reservation VMs, defaults to False.\n+nullable",
 	}
 }
