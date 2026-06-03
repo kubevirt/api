@@ -243,7 +243,6 @@ spec:
       disks:
       - blockSize:
           custom:
-            discardGranularity: 18446744073709551598
             logical: 18446744073709551609
             physical: 18446744073709551608
           matchVolume:
@@ -254,7 +253,6 @@ spec:
           bus: busValue
           readonly: true
           tray: trayValue
-        changedBlockTracking: true
         dedicatedIOThread: true
         disk:
           bus: busValue
@@ -315,7 +313,6 @@ spec:
         model: modelValue
         name: nameValue
         passt: {}
-        passtBinding: {}
         pciAddress: pciAddressValue
         ports:
         - name: nameValue
@@ -376,11 +373,7 @@ spec:
             enabled: true
           enabled: true
         tlbflush:
-          direct:
-            enabled: true
           enabled: true
-          extended:
-            enabled: true
         vapic:
           enabled: true
         vendorid:
@@ -426,8 +419,6 @@ spec:
         policy:
           encryptedState: true
         session: sessionValue
-      snp: {}
-      tdx: {}
     machine:
       type: typeValue
     memory:
@@ -435,10 +426,6 @@ spec:
       hugepages:
         pageSize: pageSizeValue
       maxGuest: "0"
-      reservedOverhead:
-        addedOverhead: "0"
-        memLock: memLockValue
-    rebootPolicy: rebootPolicyValue
     resources:
       limits:
         limitsKey: "0"
@@ -531,11 +518,6 @@ spec:
     nodeTaintsPolicy: nodeTaintsPolicyValue
     topologyKey: topologyKeyValue
     whenUnsatisfiable: whenUnsatisfiableValue
-  utilityVolumes:
-  - claimName: claimNameValue
-    name: nameValue
-    readOnly: true
-    type: typeValue
   volumes:
   - cloudInitConfigDrive:
       networkData: networkDataValue
@@ -564,9 +546,6 @@ spec:
       imagePullPolicy: imagePullPolicyValue
       imagePullSecret: imagePullSecretValue
       path: pathValue
-    containerPath:
-      path: pathValue
-      readOnly: true
     dataVolume:
       hotpluggable: true
       name: nameValue
@@ -618,21 +597,6 @@ status:
   VSOCKCID: 4294967288
   activePods:
     activePodsKey: activePodsValue
-  changedBlockTracking:
-    backupStatus:
-      backupMsg: backupMsgValue
-      backupName: backupNameValue
-      checkpointName: checkpointNameValue
-      completed: true
-      endTimestamp: "1988-01-01T01:01:01Z"
-      failed: true
-      startTimestamp: "1986-01-01T01:01:01Z"
-      volumes:
-      - dataEndpoint: dataEndpointValue
-        diskTarget: diskTargetValue
-        mapEndpoint: mapEndpointValue
-        volumeName: volumeNameValue
-    state: stateValue
   conditions:
   - lastProbeTime: "1987-01-01T01:01:01Z"
     lastTransitionTime: "1982-01-01T01:01:01Z"
@@ -644,6 +608,23 @@ status:
     cores: 4294967291
     sockets: 4294967289
     threads: 4294967289
+  deviceStatus:
+    gpuStatuses:
+    - deviceResourceClaimStatus:
+        attributes:
+          mDevUUID: mDevUUIDValue
+          pciAddress: pciAddressValue
+        name: nameValue
+        resourceClaimName: resourceClaimNameValue
+      name: nameValue
+    hostDeviceStatuses:
+    - deviceResourceClaimStatus:
+        attributes:
+          mDevUUID: mDevUUIDValue
+          pciAddress: pciAddressValue
+        name: nameValue
+        resourceClaimName: resourceClaimNameValue
+      name: nameValue
   evacuationNodeName: evacuationNodeNameValue
   fsFreezeStatus: fsFreezeStatusValue
   guestOSInfo:
@@ -678,7 +659,6 @@ status:
     guestAtBoot: "0"
     guestCurrent: "0"
     guestRequested: "0"
-    memoryOverhead: "0"
   migratedVolumes:
   - destinationPVCInfo:
       accessModes:
@@ -725,7 +705,6 @@ status:
       parallelOutboundMigrationsPerNode: 4294967263
       progressTimeout: -15
       unsafeMigrationOverride: true
-      utilityVolumesTimeout: -21
     migrationNetworkType: migrationNetworkTypeValue
     migrationPolicyName: migrationPolicyNameValue
     migrationUid: migrationUidValue
@@ -751,7 +730,6 @@ status:
     - -12
     targetDirectMigrationNodePorts:
       targetDirectMigrationNodePortsKey: -30
-    targetMemoryOverhead: "0"
     targetNode: targetNodeValue
     targetNodeAddress: targetNodeAddressValue
     targetNodeDomainDetected: true

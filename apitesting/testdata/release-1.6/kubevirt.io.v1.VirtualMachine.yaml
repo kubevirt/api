@@ -119,7 +119,6 @@ spec:
         imageio:
           certConfigMap: certConfigMapValue
           diskId: diskIdValue
-          insecureSkipVerify: true
           secretRef: secretRefValue
           url: urlValue
         pvc:
@@ -128,8 +127,6 @@ spec:
         registry:
           certConfigMap: certConfigMapValue
           imageStream: imageStreamValue
-          platform:
-            architecture: architectureValue
           pullMethod: pullMethodValue
           secretRef: secretRefValue
           url: urlValue
@@ -143,7 +140,6 @@ spec:
         upload: {}
         vddk:
           backingFile: backingFileValue
-          extraArgs: extraArgsValue
           initImageURL: initImageURLValue
           secretRef: secretRefValue
           thumbprint: thumbprintValue
@@ -440,7 +436,6 @@ spec:
           disks:
           - blockSize:
               custom:
-                discardGranularity: 18446744073709551598
                 logical: 18446744073709551609
                 physical: 18446744073709551608
               matchVolume:
@@ -451,7 +446,6 @@ spec:
               bus: busValue
               readonly: true
               tray: trayValue
-            changedBlockTracking: true
             dedicatedIOThread: true
             disk:
               bus: busValue
@@ -512,7 +506,6 @@ spec:
             model: modelValue
             name: nameValue
             passt: {}
-            passtBinding: {}
             pciAddress: pciAddressValue
             ports:
             - name: nameValue
@@ -573,11 +566,7 @@ spec:
                 enabled: true
               enabled: true
             tlbflush:
-              direct:
-                enabled: true
               enabled: true
-              extended:
-                enabled: true
             vapic:
               enabled: true
             vendorid:
@@ -623,8 +612,6 @@ spec:
             policy:
               encryptedState: true
             session: sessionValue
-          snp: {}
-          tdx: {}
         machine:
           type: typeValue
         memory:
@@ -632,10 +619,6 @@ spec:
           hugepages:
             pageSize: pageSizeValue
           maxGuest: "0"
-          reservedOverhead:
-            addedOverhead: "0"
-            memLock: memLockValue
-        rebootPolicy: rebootPolicyValue
         resources:
           limits:
             limitsKey: "0"
@@ -728,11 +711,6 @@ spec:
         nodeTaintsPolicy: nodeTaintsPolicyValue
         topologyKey: topologyKeyValue
         whenUnsatisfiable: whenUnsatisfiableValue
-      utilityVolumes:
-      - claimName: claimNameValue
-        name: nameValue
-        readOnly: true
-        type: typeValue
       volumes:
       - cloudInitConfigDrive:
           networkData: networkDataValue
@@ -761,9 +739,6 @@ spec:
           imagePullPolicy: imagePullPolicyValue
           imagePullSecret: imagePullSecretValue
           path: pathValue
-        containerPath:
-          path: pathValue
-          readOnly: true
         dataVolume:
           hotpluggable: true
           name: nameValue
@@ -813,21 +788,6 @@ spec:
             name: nameValue
   updateVolumesStrategy: updateVolumesStrategyValue
 status:
-  changedBlockTracking:
-    backupStatus:
-      backupMsg: backupMsgValue
-      backupName: backupNameValue
-      checkpointName: checkpointNameValue
-      completed: true
-      endTimestamp: "1988-01-01T01:01:01Z"
-      failed: true
-      startTimestamp: "1986-01-01T01:01:01Z"
-      volumes:
-      - dataEndpoint: dataEndpointValue
-        diskTarget: diskTargetValue
-        mapEndpoint: mapEndpointValue
-        volumeName: volumeNameValue
-    state: stateValue
   conditions:
   - lastProbeTime: "1987-01-01T01:01:01Z"
     lastTransitionTime: "1982-01-01T01:01:01Z"
@@ -879,7 +839,6 @@ status:
       disk:
         blockSize:
           custom:
-            discardGranularity: 18446744073709551598
             logical: 18446744073709551609
             physical: 18446744073709551608
           matchVolume:
@@ -890,7 +849,6 @@ status:
           bus: busValue
           readonly: true
           tray: trayValue
-        changedBlockTracking: true
         dedicatedIOThread: true
         disk:
           bus: busValue

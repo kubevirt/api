@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Copyright 2025 Red Hat, Inc.
+ * Copyright 2022 Red Hat, Inc.
  *
  */
 
-package backup
+// +k8s:deepcopy-gen=package
+// +groupName=export.kubevirt.io
+// +k8s:openapi-gen=true
 
-// GroupName is the group name used in this package
-const (
-	GroupName = "backup.kubevirt.io"
-)
+package v1alpha1
