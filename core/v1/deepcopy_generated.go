@@ -4870,28 +4870,28 @@ func (in *StallDetectorOptions) DeepCopyInto(out *StallDetectorOptions) {
 	}
 	if in.EwmaAlpha != nil {
 		in, out := &in.EwmaAlpha, &out.EwmaAlpha
-		x := (*in).DeepCopy()
-		*out = &x
+		*out = new(string)
+		**out = **in
 	}
 	if in.StallProgressTimeout != nil {
 		in, out := &in.StallProgressTimeout, &out.StallProgressTimeout
-		*out = new(int64)
+		*out = new(uint64)
 		**out = **in
 	}
 	if in.SwitchoverTimeout != nil {
 		in, out := &in.SwitchoverTimeout, &out.SwitchoverTimeout
-		*out = new(int64)
+		*out = new(uint64)
 		**out = **in
 	}
 	if in.PrecopyPossibleFactor != nil {
 		in, out := &in.PrecopyPossibleFactor, &out.PrecopyPossibleFactor
-		x := (*in).DeepCopy()
-		*out = &x
+		*out = new(string)
+		**out = **in
 	}
 	if in.PatienceWindowDecayFactor != nil {
 		in, out := &in.PatienceWindowDecayFactor, &out.PatienceWindowDecayFactor
-		x := (*in).DeepCopy()
-		*out = &x
+		*out = new(string)
+		**out = **in
 	}
 	if in.SearchLocalMinima != nil {
 		in, out := &in.SearchLocalMinima, &out.SearchLocalMinima
@@ -4900,8 +4900,8 @@ func (in *StallDetectorOptions) DeepCopyInto(out *StallDetectorOptions) {
 	}
 	if in.CompletionTimeoutFactor != nil {
 		in, out := &in.CompletionTimeoutFactor, &out.CompletionTimeoutFactor
-		x := (*in).DeepCopy()
-		*out = &x
+		*out = new(string)
+		**out = **in
 	}
 	return
 }
