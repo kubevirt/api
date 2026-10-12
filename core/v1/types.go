@@ -33,6 +33,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 
+	backupv1 "kubevirt.io/api/backup/v1alpha1"
 	cdiv1 "kubevirt.io/containerized-data-importer-api/pkg/apis/core/v1beta1"
 )
 
@@ -441,8 +442,8 @@ type KernelInfo struct {
 	// +kubebuilder:validation:Format:=int64
 	// +kubebuilder:validation:Minimum:=0
 	// +kubebuilder:validation:Maximum:=4294967295
-	// deprecated; Checksum is the checksum of the kernel image
-	DeprecatedChecksum uint32 `json:"checksum,omitempty"`
+	// Checksum is the checksum of the kernel image
+	Checksum uint32 `json:"checksum,omitempty"`
 }
 
 // InitrdInfo show info about the initrd file
@@ -450,8 +451,8 @@ type InitrdInfo struct {
 	// +kubebuilder:validation:Format:=int64
 	// +kubebuilder:validation:Minimum:=0
 	// +kubebuilder:validation:Maximum:=4294967295
-	// deprecated; Checksum is the checksum of the initrd file
-	DeprecatedChecksum uint32 `json:"checksum,omitempty"`
+	// Checksum is the checksum of the initrd file
+	Checksum uint32 `json:"checksum,omitempty"`
 }
 
 // KernelBootStatus contains info about the kernelBootContainer
@@ -487,8 +488,8 @@ type ContainerDiskInfo struct {
 	// +kubebuilder:validation:Format:=int64
 	// +kubebuilder:validation:Minimum:=0
 	// +kubebuilder:validation:Maximum:=4294967295
-	// deprecated; Checksum is the checksum of the rootdisk or kernel artifacts inside the containerdisk
-	DeprecatedChecksum uint32 `json:"checksum,omitempty"`
+	// Checksum is the checksum of the rootdisk or kernel artifacts inside the containerdisk
+	Checksum uint32 `json:"checksum,omitempty"`
 }
 
 // VolumePhase indicates the current phase of the hotplug process.
@@ -672,22 +673,12 @@ func (v *VirtualMachineInstance) IsTargetPreparing(migration *VirtualMachineInst
 	}
 }
 
-// IsDecentralizedMigration reports whether this VMI is participating in a
-// decentralized live migration. SyncAddress on SourceState/TargetState is only
-// populated for decentralized migrations; local migrations never set it.
-//
-// Historically this used SyncAddress XOR (exactly one side set), which only
-// matches the pre-sync handshake. Once both sides have published a SyncAddress,
-// XOR becomes false and callers incorrectly treat a still-decentralized VMI as
-// local (for example skipping the source Succeeded transition after handoff).
-// Presence of either SyncAddress is the durable signal for the full lifetime
-// until SourceState/TargetState are cleared on the target after success.
 func (v *VirtualMachineInstance) IsDecentralizedMigration() bool {
 	return v.Status.MigrationState != nil &&
 		v.Status.MigrationState.TargetState != nil &&
 		v.Status.MigrationState.SourceState != nil &&
-		(v.Status.MigrationState.SourceState.SyncAddress != nil ||
-			v.Status.MigrationState.TargetState.SyncAddress != nil)
+		((v.Status.MigrationState.SourceState.SyncAddress == nil && v.Status.MigrationState.TargetState.SyncAddress != nil) ||
+			(v.Status.MigrationState.SourceState.SyncAddress != nil && v.Status.MigrationState.TargetState.SyncAddress == nil))
 }
 
 type VirtualMachineInstanceConditionType string
@@ -1170,17 +1161,6 @@ const (
 	// Similar to kubevirt.io/domain. Used on Pod.
 	// Internal use only.
 	CreatedByLabel string = "kubevirt.io/created-by"
-	// Owner VMI name/UID recorded on a pod, used to recover the VMI when the
-	// owner chain cannot be resolved. Used on Pod.
-	// Internal use only.
-	OwnerVMINameAnnotation string = "kubevirt.io/owner-vmi-name"
-	OwnerVMIUIDAnnotation  string = "kubevirt.io/owner-vmi-uid"
-	// ImageVolumeSkipDigestResolutionAnnotation skips the digest-resolving init
-	// containers for containerDisk volumes when the ImageVolume feature gate is
-	// enabled. Required for OCI artifacts (e.g. raw disk images pushed with ORAS)
-	// that are not valid container images. Will be removed once VEP #117 / KEP 5365
-	// provides digest resolution via Pod volume status.
-	ImageVolumeSkipDigestResolutionAnnotation string = "kubevirt.io/image-volume-skip-digest-resolution"
 	// This label is used to indicate that this pod is the target of a migration job.
 	MigrationJobLabel string = "kubevirt.io/migrationJobUID"
 	// This label indicates the migration name that a PDB is protecting.
@@ -1262,6 +1242,7 @@ const (
 	// Set By VM controller on VMIs to ensure VMIs are processed by VM controller during deletion
 	VirtualMachineControllerFinalizer        string = "kubevirt.io/virtualMachineControllerFinalize"
 	VirtualMachineInstanceMigrationFinalizer string = "kubevirt.io/migrationJobFinalize"
+	DeprecatedCPUManager                     string = "cpumanager"
 	CPUManager                               string = "kubevirt.io/cpumanager"
 	// This annotation is used to inject ignition data
 	// Used on VirtualMachineInstance.
@@ -1309,10 +1290,6 @@ const (
 	VirtualMachineLabel               = AppLabel + "/vm"
 	MemfdMemoryBackend         string = "kubevirt.io/memfd"
 
-	// MergeableMemory controls whether guest memory pages may be merged with other
-	// processes via Kernel Same-page Merging (KSM). Set to "false" to opt out.
-	MergeableMemory string = "kubevirt.io/mergeable-memory"
-
 	MigrationSelectorLabel = "kubevirt.io/vmi-name"
 	// RestoreRunStrategy is how to restore the run strategy of the VMI
 	RestoreRunStrategy = "kubevirt.io/restore-run-strategy"
@@ -1324,6 +1301,9 @@ const (
 	CreateMigrationTarget = "kubevirt.io/create-migration-target"
 	// This annotation is to keep virt launcher container alive when an VMI encounters a failure for debugging purpose
 	KeepLauncherAfterFailureAnnotation string = "kubevirt.io/keep-launcher-alive-after-failure"
+
+	// MigrationTransportUnixAnnotation means that the VMI will be migrated using the unix URI
+	MigrationTransportUnixAnnotation string = "kubevirt.io/migrationTransportUnix"
 
 	// MigrationUnschedulablePodTimeoutSecondsAnnotation represents a custom timeout period used for unschedulable target pods
 	// This exists for functional testing
@@ -1399,7 +1379,7 @@ const (
 	VirtualMachinePoolRevisionName string = "kubevirt.io/vm-pool-revision-name"
 
 	// DeprecatedVirtualMachineNameLabel is the name of the Virtual Machine
-	// Deprecated: Use VirtualMachineInstanceIDLabel instead. Kept for backwards compatibility.
+	// Deprecated: Use VirtualMachineInstanceSelectorLabel instead. Kept for backwards compatibility.
 	DeprecatedVirtualMachineNameLabel string = "vm.kubevirt.io/name"
 
 	// VirtualMachineInstanceIDLabel is applied to virt-launcher pods to provide a
@@ -1455,9 +1435,6 @@ const (
 
 	// MigrationInterfaceName is an arbitrary name used in virt-handler to connect it to a dedicated migration network
 	MigrationInterfaceName string = "migration0"
-
-	// CrossClusterMigrationInterfaceName is the name of the interface used for cross-cluster migration
-	CrossClusterMigrationInterfaceName string = "crosscluster0"
 
 	// EmulatorThreadCompleteToEvenParity alpha annotation will cause Kubevirt to complete the VMI's CPU count to an even parity when IsolateEmulatorThread options are requested
 	EmulatorThreadCompleteToEvenParity string = "alpha.kubevirt.io/EmulatorThreadCompleteToEvenParity"
@@ -2277,17 +2254,10 @@ type VirtualMachineInstanceBackupStatus struct {
 	// Volumes lists the volumes included in the backup
 	// +optional
 	// +listType=atomic
-	Volumes []VirtualMachineInstanceBackupVolumeInfo `json:"volumes,omitempty"`
+	Volumes []backupv1.BackupVolumeInfo `json:"volumes,omitempty"`
 	// QuiesceStatus indicates whether filesystem freeze succeeded, failed, or was skipped.
 	// +optional
 	QuiesceStatus string `json:"quiesceStatus,omitempty"`
-}
-
-// VirtualMachineInstanceBackupVolumeInfo contains information about a volume included in a backup
-// +k8s:openapi-gen=true
-type VirtualMachineInstanceBackupVolumeInfo struct {
-	// VolumeName is the volume name from VMI spec
-	VolumeName string `json:"volumeName"`
 }
 
 // ChangedBlockTrackingStatus represents the status of ChangedBlockTracking for a VM
@@ -2407,8 +2377,6 @@ const (
 	CacheWriteThrough DriverCache = "writethrough"
 	// CacheWriteBack - I/O from the guest is cached on the host.
 	CacheWriteBack DriverCache = "writeback"
-	// CacheDirectSync - I/O from the guest bypasses the host page cache and is written to the physical medium synchronously.
-	CacheDirectSync DriverCache = "directsync"
 
 	// IOThreads - User mode based threads with a shared lock that perform I/O tasks. Can impact performance but offers
 	// more predictable behaviour. This method is also takes fewer CPU cycles to submit I/O requests.
@@ -2646,12 +2614,6 @@ type KubeVirtSpec struct {
 	// +optional
 	Workloads *ComponentConfig `json:"workloads,omitempty"`
 
-	// SynchronizationPlacement allows customization of node placement for synchronization controllers.
-	// This can be used to schedule sync controllers on specific nodes (e.g., nodes with access to
-	// the cross-cluster migration network). By default, sync controllers use control-plane placement.
-	// +optional
-	SynchronizationPlacement *ComponentConfig `json:"synchronizationPlacement,omitempty"`
-
 	CustomizeComponents CustomizeComponents `json:"customizeComponents,omitempty"`
 }
 
@@ -2776,6 +2738,7 @@ const (
 	// Whether all resources were created and up-to-date
 	KubeVirtConditionCreated KubeVirtConditionType = "Created"
 
+	// Conditions for HCO, see https://github.com/kubevirt/hyperconverged-cluster-operator/blob/master/docs/conditions.md
 	// Whether KubeVirt is functional and available in the cluster.
 	KubeVirtConditionAvailable KubeVirtConditionType = "Available"
 	// Whether the operator is actively making changes to KubeVirt
@@ -3451,31 +3414,29 @@ type StallDetectorOptions struct {
 	// observed migration bandwidth. Must be in the range (0, 1]; zero is invalid because
 	// the estimate would never incorporate new samples. Higher values weight recent samples
 	// more heavily.
-	// Defaults to 0.4.
+	// Defaults to "0.4".
 	//+optional
-	EwmaAlpha *resource.Quantity `json:"ewmaAlpha,omitempty"`
+	EwmaAlpha *string `json:"ewmaAlpha,omitempty"`
 	// StallProgressTimeout is the duration in seconds of the sliding window used to track
 	// minimum remaining-bytes and detect when migration progress has stalled.
 	// Defaults to 40.
 	//+optional
-	// +kubebuilder:validation:Minimum=0
-	StallProgressTimeout *int64 `json:"stallProgressTimeout,omitempty"`
+	StallProgressTimeout *uint64 `json:"stallProgressTimeout,omitempty"`
 	// SwitchoverTimeout is the duration in seconds allowed for a stop-and-copy or post-copy
 	// switchover to complete after being triggered before the migration is aborted.
 	// Defaults to 60.
 	//+optional
-	// +kubebuilder:validation:Minimum=0
-	SwitchoverTimeout *int64 `json:"switchoverTimeout,omitempty"`
+	SwitchoverTimeout *uint64 `json:"switchoverTimeout,omitempty"`
 	// PrecopyPossibleFactor is the maximum factor by which estimated downtime may exceed
 	// MaxDowntime while still attempting a soft stop-and-copy instead of aborting the migration.
-	// Defaults to 1.5.
+	// Defaults to "1.5".
 	//+optional
-	PrecopyPossibleFactor *resource.Quantity `json:"precopyPossibleFactor,omitempty"`
+	PrecopyPossibleFactor *string `json:"precopyPossibleFactor,omitempty"`
 	// PatienceWindowDecayFactor is the factor by which the relaxation patience window is
 	// multiplied after each best-remaining-bytes relaxation step.
-	// Defaults to 0.5.
+	// Defaults to "0.5".
 	//+optional
-	PatienceWindowDecayFactor *resource.Quantity `json:"patienceWindowDecayFactor,omitempty"`
+	PatienceWindowDecayFactor *string `json:"patienceWindowDecayFactor,omitempty"`
 	// SearchLocalMinima controls whether convergence actions are delayed until remaining bytes
 	// reach a local minimum near the best observed value. When false, actions may trigger
 	// as soon as a stall is detected.
@@ -3485,9 +3446,9 @@ type StallDetectorOptions struct {
 	// CompletionTimeoutFactor multiplies the computed migration completion timeout to determine
 	// the total time budget for deciding whether a forced switchover can still finish in time,
 	// and to extend the abort deadline after initiating a completion-timeout-driven switchover.
-	// Defaults to 2.
+	// Defaults to "2".
 	//+optional
-	CompletionTimeoutFactor *resource.Quantity `json:"completionTimeoutFactor,omitempty"`
+	CompletionTimeoutFactor *string `json:"completionTimeoutFactor,omitempty"`
 }
 
 // MigrationCompression represents the compression method for live migration.
@@ -3505,42 +3466,12 @@ const (
 type ExperimentalMigrationOptions struct {
 	//+optional
 	StallDetector *StallDetectorOptions `json:"stallDetector,omitempty"`
-	// DowntimeTuning configures iteration-aware downtime ramping for live
-	// migration convergence.
-	//+optional
-	DowntimeTuning *DowntimeTuningOptions `json:"downtimeTuning,omitempty"`
 	// Compression selects the algorithm for compressing the live migration
 	// data stream. When omitted (nil) or set to "none", compression is
 	// disabled.
 	// +kubebuilder:validation:Enum=none;zstd
 	//+optional
 	Compression *MigrationCompression `json:"compression,omitempty"`
-}
-
-// DowntimeTuningOptions controls how virt-launcher gradually increases
-// max_downtime during live migration to help convergence.
-type DowntimeTuningOptions struct {
-	// InitialMs is the initial max_downtime value in milliseconds
-	// set at the start of migration. Tuning steps increase from this value.
-	// Defaults to 150.
-	// +kubebuilder:validation:Minimum=1
-	//+optional
-	InitialMs *int64 `json:"initialMs,omitempty"`
-	// Steps is the number of equal increments used to ramp from
-	// InitialMs to the cluster-level MaxDowntimeMs. Defaults to 7.
-	// +kubebuilder:validation:Minimum=1
-	//+optional
-	Steps *int32 `json:"steps,omitempty"`
-	// StartAfterIteration is the memory copy iteration after which
-	// downtime tuning begins. Defaults to 3.
-	// +kubebuilder:validation:Minimum=1
-	//+optional
-	StartAfterIteration *int64 `json:"startAfterIteration,omitempty"`
-	// CooldownSeconds is the minimum interval in seconds
-	// between successive downtime increases. Defaults to 10.
-	// +kubebuilder:validation:Minimum=1
-	//+optional
-	CooldownSeconds *int32 `json:"cooldownSeconds,omitempty"`
 }
 
 // VMIMConfigurationOptions holds the resolved migration options for a single migration.
@@ -3592,12 +3523,8 @@ type VMIMConfigurationOptions struct {
 	// permitted, migration will be switched to post-copy or the VMI will be
 	// paused to allow the migration to complete
 	AllowWorkloadDisruption *bool `json:"allowWorkloadDisruption,omitempty"`
-	// DisableTLS disables both TLS encryption and mutual TLS authentication
-	// on the migration proxy when set to true. This removes all cryptographic
-	// protection from the migration data stream.
-	// When disabled, implement network-level access controls to restrict
-	// migration traffic to trusted sources only.
-	// Defaults to false.
+	// When set to true, DisableTLS will disable the additional layer of live migration encryption
+	// provided by KubeVirt. This is usually a bad idea. Defaults to false
 	DisableTLS *bool `json:"disableTLS,omitempty"`
 	// Network is the name of the CNI network to use for live migrations. By default, migrations go
 	// through the pod network.
@@ -3661,53 +3588,18 @@ type MigrationConfiguration struct {
 	// permitted, migration will be switched to post-copy or the VMI will be
 	// paused to allow the migration to complete
 	AllowWorkloadDisruption *bool `json:"allowWorkloadDisruption,omitempty"`
-	// DisableTLS disables both TLS encryption and mutual TLS authentication
-	// on the migration proxy when set to true. This removes all cryptographic
-	// protection from the migration data stream.
-	// When disabled, implement network-level access controls to restrict
-	// migration traffic to trusted sources only.
-	// Defaults to false.
+	// When set to true, DisableTLS will disable the additional layer of live migration encryption
+	// provided by KubeVirt. This is usually a bad idea. Defaults to false
 	DisableTLS *bool `json:"disableTLS,omitempty"`
 	// Network is the name of the CNI network to use for live migrations. By default, migrations go
-	// through the pod network. When decentralizedLiveMigrationDatapath is Proxy, this network is
-	// also used for virt-handler ↔ synchronization-controller migration listeners (omit = pod IP).
-	// If set with Proxy, synchronization controllers require the migration0 interface at startup
-	// and will fail to start if it is missing.
+	// through the pod network.
 	Network *string `json:"network,omitempty"`
 	// By default, the SELinux level of target virt-launcher pods is forced to the level of the source virt-launcher.
 	// When set to true, MatchSELinuxLevelOnMigration lets the CRI auto-assign a random level to the target.
 	// That will ensure the target virt-launcher doesn't share categories with another pod on the node.
 	// However, migrations will fail when using RWX volumes that don't automatically deal with SELinux levels.
 	MatchSELinuxLevelOnMigration *bool `json:"matchSELinuxLevelOnMigration,omitempty"`
-	// CrossClusterNetwork is the name of the CNI network used for synchronization-controller
-	// peer traffic when decentralizedLiveMigrationDatapath is Proxy. When set, sync controllers
-	// attach to this network as crosscluster0 and bind the sync gRPC port only there.
-	// When omitted with Proxy, peer traffic uses the pod network. Must not be set when
-	// decentralizedLiveMigrationDatapath is Direct (or unset).
-	CrossClusterNetwork *string `json:"crossClusterNetwork,omitempty"`
-	// DecentralizedLiveMigrationDatapath selects how live-migration traffic moves for
-	// decentralized live migrations (cross-namespace or cross-cluster).
-	// Direct (default when unset): no synchronization-controller migration-data proxy.
-	// Proxy: sync controllers proxy migration traffic on a single gRPC port.
-	// Requires the CrossClusterMigrationProxy feature gate while Alpha.
-	// +optional
-	// +kubebuilder:validation:Enum=Direct;Proxy
-	DecentralizedLiveMigrationDatapath *DecentralizedLiveMigrationDatapath `json:"decentralizedLiveMigrationDatapath,omitempty"`
 }
-
-// DecentralizedLiveMigrationDatapath selects how migration data is transferred for
-// decentralized live migrations.
-// +kubebuilder:validation:Enum=Direct;Proxy
-type DecentralizedLiveMigrationDatapath string
-
-const (
-	// DecentralizedLiveMigrationDatapathDirect transfers migration data without the
-	// synchronization-controller proxy (default when the field is unset).
-	DecentralizedLiveMigrationDatapathDirect DecentralizedLiveMigrationDatapath = "Direct"
-	// DecentralizedLiveMigrationDatapathProxy proxies migration data through
-	// synchronization controllers.
-	DecentralizedLiveMigrationDatapathProxy DecentralizedLiveMigrationDatapath = "Proxy"
-)
 
 // DiskVerification holds container disks verification limits
 type DiskVerification struct {
@@ -3764,48 +3656,15 @@ type DeveloperConfiguration struct {
 	ClusterProfiler bool `json:"clusterProfiler,omitempty"`
 }
 
-// LogVerbosity sets log verbosity level of various components
+// LogVerbosity sets log verbosity level of  various components
 type LogVerbosity struct {
-	// VirtAPI specifies the log verbosity level for the virt-api deployment.
-	// A higher value increases the amount of logged information.
-	// Changes take effect on the fly without triggering a pod restart.
-	// Default: 2. Levels up to 9 produce progressively more detailed logs.
-	// +optional
-	VirtAPI uint `json:"virtAPI,omitempty"`
-	// VirtController specifies the log verbosity level for the virt-controller deployment.
-	// A higher value increases the amount of logged information.
-	// Changes take effect on the fly without triggering a pod restart.
-	// Default: 2. Levels up to 9 produce progressively more detailed logs.
-	// +optional
-	VirtController uint `json:"virtController,omitempty"`
-	// VirtHandler specifies the log verbosity level for the virt-handler DaemonSet.
-	// A higher value increases the amount of logged information.
-	// Changes take effect on the fly without triggering a pod restart.
-	// Default: 2. Levels up to 9 produce progressively more detailed logs.
-	// +optional
-	VirtHandler uint `json:"virtHandler,omitempty"`
-	// VirtLauncher specifies the log verbosity level for virt-launcher pods managing VMI workloads.
-	// A higher value increases the amount of logged information.
-	// Changes apply to newly created virt-launcher pods. Existing pods retain their original verbosity.
-	// Default: 2. Levels up to 9 produce progressively more detailed logs.
-	// +optional
-	VirtLauncher uint `json:"virtLauncher,omitempty"`
-	// VirtOperator specifies the log verbosity level for the virt-operator deployment.
-	// A higher value increases the amount of logged information.
-	// Changes take effect on the fly without triggering a pod restart.
-	// Default: 2. Levels up to 9 produce progressively more detailed logs.
-	// +optional
-	VirtOperator uint `json:"virtOperator,omitempty"`
-	// VirtSynchronizationController specifies the log verbosity level for the virt-synchronization-controller component.
-	// A higher value increases the amount of logged information.
-	// Changes take effect on the fly without triggering a pod restart.
-	// Default: 2. Levels up to 9 produce progressively more detailed logs.
-	// +optional
+	VirtAPI                       uint `json:"virtAPI,omitempty"`
+	VirtController                uint `json:"virtController,omitempty"`
+	VirtHandler                   uint `json:"virtHandler,omitempty"`
+	VirtLauncher                  uint `json:"virtLauncher,omitempty"`
+	VirtOperator                  uint `json:"virtOperator,omitempty"`
 	VirtSynchronizationController uint `json:"virtSynchronizationController,omitempty"`
-	// NodeVerbosity represents a map of node names to specific log verbosity levels.
-	// Allows overriding verbosity on specific nodes without altering cluster-wide settings.
-	// Changes take effect on the fly without triggering a pod restart.
-	// +optional
+	// NodeVerbosity represents a map of nodes with a specific verbosity level
 	NodeVerbosity map[string]uint `json:"nodeVerbosity,omitempty"`
 }
 

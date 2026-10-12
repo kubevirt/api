@@ -1021,19 +1021,13 @@
         "experimental": {
           "stallDetector": {
             "stallMargin": -11,
-            "ewmaAlpha": "0",
-            "stallProgressTimeout": -20,
-            "switchoverTimeout": -17,
-            "precopyPossibleFactor": "0",
-            "patienceWindowDecayFactor": "0",
+            "ewmaAlpha": "ewmaAlphaValue",
+            "stallProgressTimeout": 18446744073709551596,
+            "switchoverTimeout": 18446744073709551599,
+            "precopyPossibleFactor": "precopyPossibleFactorValue",
+            "patienceWindowDecayFactor": "patienceWindowDecayFactorValue",
             "searchLocalMinima": true,
-            "completionTimeoutFactor": "0"
-          },
-          "downtimeTuning": {
-            "initialMs": -9,
-            "steps": -5,
-            "startAfterIteration": -19,
-            "cooldownSeconds": -15
+            "completionTimeoutFactor": "completionTimeoutFactorValue"
           },
           "compression": "compressionValue"
         }
@@ -1206,7 +1200,10 @@
         "checkpointName": "checkpointNameValue",
         "volumes": [
           {
-            "volumeName": "volumeNameValue"
+            "volumeName": "volumeNameValue",
+            "diskTarget": "diskTargetValue",
+            "dataEndpoint": "dataEndpointValue",
+            "mapEndpoint": "mapEndpointValue"
           }
         ],
         "quiesceStatus": "quiesceStatusValue"

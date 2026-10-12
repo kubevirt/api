@@ -637,7 +637,10 @@ status:
       quiesceStatus: quiesceStatusValue
       startTimestamp: "1986-01-01T01:01:01Z"
       volumes:
-      - volumeName: volumeNameValue
+      - dataEndpoint: dataEndpointValue
+        diskTarget: diskTargetValue
+        mapEndpoint: mapEndpointValue
+        volumeName: volumeNameValue
     state: stateValue
   conditions:
   - lastProbeTime: "1987-01-01T01:01:01Z"
@@ -726,20 +729,15 @@ status:
       disableTLS: true
       experimental:
         compression: compressionValue
-        downtimeTuning:
-          cooldownSeconds: -15
-          initialMs: -9
-          startAfterIteration: -19
-          steps: -5
         stallDetector:
-          completionTimeoutFactor: "0"
-          ewmaAlpha: "0"
-          patienceWindowDecayFactor: "0"
-          precopyPossibleFactor: "0"
+          completionTimeoutFactor: completionTimeoutFactorValue
+          ewmaAlpha: ewmaAlphaValue
+          patienceWindowDecayFactor: patienceWindowDecayFactorValue
+          precopyPossibleFactor: precopyPossibleFactorValue
           searchLocalMinima: true
           stallMargin: -11
-          stallProgressTimeout: -20
-          switchoverTimeout: -17
+          stallProgressTimeout: 18446744073709551596
+          switchoverTimeout: 18446744073709551599
       matchSELinuxLevelOnMigration: true
       maxDowntimeMs: 18446744073709551603
       network: networkValue

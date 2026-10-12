@@ -47,10 +47,9 @@ const (
 )
 
 const (
-	ControllerRevisionObjectGenerationLabel                 = "instancetype.kubevirt.io/object-generation"
-	ControllerRevisionObjectKindLabel                       = "instancetype.kubevirt.io/object-kind"
-	ControllerRevisionObjectNameLabel                       = "instancetype.kubevirt.io/object-name"
-	ControllerRevisionObjectUIDLabel                        = "instancetype.kubevirt.io/object-uid"
-	ControllerRevisionObjectVersionLabel                    = "instancetype.kubevirt.io/object-version"
-	ControllerRevisionObjectCommonInstancetypesVersionLabel = "instancetype.kubevirt.io/common-instancetypes-version"
+	ControllerRevisionObjectGenerationLabel = "instancetype.kubevirt.io/object-generation"
+	ControllerRevisionObjectKindLabel       = "instancetype.kubevirt.io/object-kind"
+	ControllerRevisionObjectNameLabel       = "instancetype.kubevirt.io/object-name"
+	ControllerRevisionObjectUIDLabel        = "instancetype.kubevirt.io/object-uid"
+	ControllerRevisionObjectVersionLabel    = "instancetype.kubevirt.io/object-version"
 )
