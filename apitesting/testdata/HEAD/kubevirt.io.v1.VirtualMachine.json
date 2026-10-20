@@ -993,8 +993,7 @@
             "readOnly": true,
             "type": "typeValue"
           }
-        ],
-        "emulationPolicy": "emulationPolicyValue"
+        ]
       }
     },
     "dataVolumeTemplates": [

@@ -77,17 +77,6 @@ const (
 	StartStrategyPaused StartStrategy = "Paused"
 )
 
-type EmulationPolicy string
-
-var EmulationPolicies = []EmulationPolicy{EmulationPolicyNone, EmulationPolicyHardware, EmulationPolicySoftware}
-
-// Valid EmultionPolicy values
-const (
-	EmulationPolicyNone     EmulationPolicy = "None"
-	EmulationPolicyHardware EmulationPolicy = "Hardware"
-	EmulationPolicySoftware EmulationPolicy = "Software"
-)
-
 // VirtualMachineInstanceSpec is a description of a VirtualMachineInstance.
 type VirtualMachineInstanceSpec struct {
 
@@ -212,22 +201,6 @@ type VirtualMachineInstanceSpec struct {
 	// +listMapKey=name
 	// +optional
 	UtilityVolumes []UtilityVolume `json:"utilityVolumes,omitempty"`
-	// The most permissive emulation backend this VM may use.
-	// Takes precedence over spec.configuration.emulationPolicy in the KubeVirt CR.
-	//
-	// Valid Options from least to most permissive are:
-	// - None: Only native-kvm
-	// - Hardware: Not yet implemented
-	// - Software: Qemu TCG cross-architecture emulation
-	// Default policy is 'None'
-	//
-	// This is an alpha field and should only be configured if the
-	// feature-gate CrossArchitectureVirtualization is enabled.
-	// This feature is in alpha.
-	//
-	// +optional
-	// +kubebuilder:validation:Enum=None;Hardware;Software
-	EmulationPolicy *EmulationPolicy `json:"emulationPolicy,omitempty"`
 }
 
 type VirtualMachineInstanceResourceClaim struct {
@@ -3274,23 +3247,6 @@ type KubeVirtConfiguration struct {
 	// +optional
 	// +kubebuilder:validation:Enum=AggregateToDefault;Manual
 	RoleAggregationStrategy *RoleAggregationStrategy `json:"roleAggregationStrategy,omitempty"`
-
-	// EmulationPolicy is the default emulation policy for VMs that do not set
-	// spec.emulationPolicy. A VM may set a more permissive policy.
-	//
-	// Valid Options from least to most permissive are:
-	// - None: Only native-kvm
-	// - Hardware: Not yet implemented
-	// - Software: Qemu TCG cross-architecture emulation
-	// Default policy is 'None'
-	//
-	// This is an alpha field and should only be configured if the
-	// feature-gate CrossArchitectureVirtualization is enabled.
-	// This feature is in alpha.
-	//
-	// +optional
-	// +kubebuilder:validation:Enum=None;Hardware;Software
-	EmulationPolicy *EmulationPolicy `json:"emulationPolicy,omitempty"`
 }
 
 // QGSConfiguration holds QGS configuration

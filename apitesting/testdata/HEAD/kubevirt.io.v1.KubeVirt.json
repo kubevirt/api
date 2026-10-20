@@ -430,8 +430,7 @@
           }
         }
       },
-      "roleAggregationStrategy": "roleAggregationStrategyValue",
-      "emulationPolicy": "emulationPolicyValue"
+      "roleAggregationStrategy": "roleAggregationStrategyValue"
     },
     "infra": {
       "nodePlacement": {

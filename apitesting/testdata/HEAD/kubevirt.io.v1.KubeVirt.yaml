@@ -142,7 +142,6 @@ spec:
       useEmulation: true
     emulatedMachines:
     - emulatedMachinesValue
-    emulationPolicy: emulationPolicyValue
     evictionStrategy: evictionStrategyValue
     handlerConfiguration:
       restClient:

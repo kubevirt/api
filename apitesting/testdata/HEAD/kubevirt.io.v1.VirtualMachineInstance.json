@@ -933,8 +933,7 @@
         "readOnly": true,
         "type": "typeValue"
       }
-    ],
-    "emulationPolicy": "emulationPolicyValue"
+    ]
   },
   "status": {
     "nodeName": "nodeNameValue",
