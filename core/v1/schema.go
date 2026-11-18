@@ -576,9 +576,7 @@ type Devices struct {
 	// +optional
 	Rng *Rng `json:"rng,omitempty"`
 	// Whether or not to enable virtio multi-queue for block devices.
-	// Explicit false configures a single request queue.
-	// When omitted, the queue count depends on device and IOThread
-	// configuration, falling back to hypervisor defaults when unspecified.
+	// Defaults to false.
 	// +optional
 	BlockMultiQueue *bool `json:"blockMultiQueue,omitempty"`
 	// If specified, virtual network interfaces configured with a virtio bus will also enable the vhost multiqueue feature for network devices. The number of queues created depends on additional factors of the VirtualMachineInstance, like the number of guest CPUs.
